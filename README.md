@@ -1,2 +1,0 @@
-janrain-python-api
-==================
