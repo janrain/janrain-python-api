@@ -31,6 +31,6 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Internet :: WWW/HTTP",
         # TODO: trove category for license
-    ]
-    #test_suite = "janrain.capture.test"
+    ],
+    test_suite = "janrain.capture.test"
 )
