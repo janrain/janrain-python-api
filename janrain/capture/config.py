@@ -32,7 +32,8 @@ def cluster(cluster_name):
     Get the client_id and client_secret defined for the specified cluster.
     
     Args:
-        The name of the cluster defined in the .apidrc file. Eg. "prod".
+        cluster_name - The name of the cluster defined in the .apidrc file. 
+                       Eg. "prod".
     
     Returns:
         A dictionary containing the cluster settings.
@@ -43,4 +44,20 @@ def cluster(cluster_name):
     except KeyError as error:
         raise KeyError("A cluster named '{}' was not found in the config file" \
                        .format(cluster_name))
+
+def client(client_name):
+    """
+    Get the settings defined for the specified client.
     
+    Args:
+        client_name - The name of the client defined in the .apidrc file. 
+    
+    Returns:
+        A dictionary containing the cluster settings.
+    """
+    config = read_config_file()
+    try:
+        return config['clients'][client_name]
+    except KeyError as error:
+        raise KeyError("A client named '{}' was not found in the config file" \
+                       .format(client_name))
