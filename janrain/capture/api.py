@@ -1,4 +1,4 @@
-""" Base class for making signed API requests to the Janrain API. """
+""" Base class for making API calls to the Janrain API. """
 # pylint: disable=E0611
 from janrain.capture.exceptions import InvalidApiCallError, ApiResponseError
 from urllib import urlencode
@@ -11,6 +11,9 @@ from hashlib import sha1
 import hmac
 import time
 import logging
+
+import logging
+logging.basicConfig()
 
 def api_encode(value):
     """
@@ -44,7 +47,10 @@ class Api(object):
     """
     def __init__(self, api_url, defaults=None):
         self.logger = logging.getLogger(__name__)
-        self.api_url = api_url
+        if api_url[0:4] == "http":
+            self.api_url = api_url
+        else:
+            self.api_url = "https://" + api_url
         self.defaults = defaults
     
     def call(self, api_call, **kwargs):
@@ -110,7 +116,7 @@ class Api(object):
         data = json_decode(response)
         
         if data['stat'] == 'error':
-            self.logger.warn("Response:\n" + json_encode(data, indent=4))
+            self.logger.debug("Response:\n" + json_encode(data, indent=4))
             raise ApiResponseError(data['code'], data['error'], 
                                    data['error_description'], data)
         return data
