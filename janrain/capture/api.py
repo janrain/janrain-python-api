@@ -1,8 +1,9 @@
 """ Base class for making API calls to the Janrain API. """
 # pylint: disable=E0611
-from janrain.capture.exceptions import InvalidApiCallError, ApiResponseError
+from janrain.capture.exceptions import InvalidApiCallError, ApiResponseError, \
+                                       JanrainInvalidUrlError
 from urllib import urlencode
-from urllib2 import Request, urlopen, HTTPError
+from urllib2 import Request, urlopen, HTTPError, URLError
 from json import loads as json_decode
 from json import dumps as json_encode
 from contextlib import closing
@@ -12,8 +13,7 @@ import hmac
 import time
 import logging
 
-import logging
-logging.basicConfig()
+#logging.basicConfig()
 
 def api_encode(value):
     """
@@ -94,6 +94,11 @@ class Api(object):
                 body = error.fp.read()
             elif error.code == 404:
                 raise InvalidApiCallError(api_call, error.code)
+            else:
+                raise error
+        except URLError as error:
+            if error.reason.errno == -2:
+                raise JanrainInvalidUrlError("Invalid API URL: " + url)
             else:
                 raise error
 

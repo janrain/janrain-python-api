@@ -9,7 +9,11 @@ class InvalidApiCallError(JanrainApiException):
     def __init__(self, api_call, status):
         message = "Invalid API call: {} ({})".format(api_call, status)
         JanrainApiException.__init__(self, message)
-        
+
+class JanrainInvalidUrlError(Exception):
+    """ Invalid URL. """
+    pass
+    
 class ApiResponseError(JanrainApiException):
     """ An error response from the capture API. """
     def __init__(self, code, error, error_description, response):
@@ -17,4 +21,3 @@ class ApiResponseError(JanrainApiException):
         self.code = code
         self.error = error
         self.response = response
-
