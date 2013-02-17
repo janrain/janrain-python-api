@@ -20,7 +20,7 @@ setup(
     url = "http://developers.janrain.com/",
     packages = find_packages(),
     namespace_packages = ["janrain"],
-    #scripts=[os.path.join("bin", script) for script in os.listdir("./bin")],
+    scripts=[os.path.join("bin", script) for script in os.listdir("./bin")],
     #license = "",
     classifiers = [
         "Development Status :: 1 - Planning",
