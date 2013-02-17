@@ -5,20 +5,23 @@ import argparse
 import json
 from janrain.capture import Api, config, ApiResponseError
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 def parse_args():
     """
     Return populated argument parser namespace.
     """
     parser = argparse.ArgumentParser()
     
-    parser.add_argument('-c', '--cluster',
-                        help="Use the client_id and client_secret defined in the .apidrc file.")
+    parser.add_argument('-c', '--client',
+                        help="Use the settings defined in the .apidrc file for a specific client.")
+    parser.add_argument('-u', '--api_url', 
+                        help="The full URL to the apid server.")
     parser.add_argument('-i', '--client-id',
                         help="The client_id to use when making the API call.")
     parser.add_argument('-s', '--client-secret',
                         help="The client_secret to use when making the API call.")
-    parser.add_argument('api_url', 
-                        help="The full URL to the apid server.")
     parser.add_argument('api_call', 
                         help="The API endpoint to call.")
     parser.add_argument('-p', '--parameters', nargs='*', metavar="parameter=value",
@@ -34,20 +37,26 @@ def main():
     
     # Get authentication which should either be a cluster defined in the 
     # .apidrc or an explicity passed client_id and client_secret
-    if args.cluster:
+    if args.client:
         try:
-            defaults = config.cluster(args.cluster)
+            client = config.client(args.client)
         except KeyError as error:
             sys.exit(str(error))
-    elif args.client_id and args.client_secret:
+        defaults = {
+            'client_id': client['client_id'],
+            'client_secret': client['client_secret']
+        }
+        api_url = client['apid_uri']
+    elif args.client_id and args.client_secret and args.api_url:
         defaults = {
             'client_id': args.client_id, 
             'client_secret': args.client_secret
         }
+        api_url = args.api_url
     else:
-        sys.exit("You must pass --cluster as defined in the .apidrc file " \
-                 "or pass --client-id and --client-secret.")   
-    api = Api(args.api_url, defaults)
+        sys.exit("You must pass --client as defined in the .apidrc file " \
+                 "or pass --api-url, --client-id, and --client-secret.")   
+    api = Api(api_url, defaults)
     
     # map list of parameters from command line into a dict for use as kwargs
     kwargs = {}

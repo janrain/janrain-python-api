@@ -18,7 +18,7 @@ Then install it using ``setup.py``::
     python setup.py install
     
 
-Quick Start
+Basic Usage
 -----------
 
 Low-Level API Calls
@@ -77,7 +77,42 @@ that call the Janrain API.
         sys.exit("API Error: " + message)
 
 
+Command-Line Utility
+--------------------
 
+The package installs an executable named ``capture-api`` for accessing making
+API calls from the command-line. 
+
+If you have the ``.apidrc`` configuration file, you can specify the client using
+the ``--client`` argument. Otherwise you will need to specify ``--api-url``,
+``--client-id``, and ``--client-secret``. 
+
+All parameters should be passed as key=value pairs after the ``--parameters``
+argument. 
+
+Examples
+~~~~~~~~
+
+Using the client defined in ``.apidrc`` file::
+ 
+    capture-api --client=demo entity.count --parameters type_name=user
+
+Passing the authentication credentials::
+
+    capture-api --api-url=[YOUR_CAPTURE_URL] \
+                --client-id=[YOUR_CLIENT_ID] \
+                --client-secret=[YOUR_CLIENT_SECRET] \
+                entity.count --parameters type_name=user
+
+Enclose JSON values in single outer-quotes and double inner-quotes::
+
+    capture-api --client=demo entity.find --parameters type_name=user \
+                attributes='["displayName","email"]'
+
+Enclose filters in double outer-quotes and single inner-quotes::
+
+    capture-api --client=demo entity.find --parameters type_name=user \
+                filter="email = 'demo@janrain.com' and birthday is null"
 
 ----
 
