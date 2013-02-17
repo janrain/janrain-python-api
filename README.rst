@@ -39,6 +39,24 @@ Use ``janrain.capture.Api`` to make low-level calls to the API.
     result = api.call("entity.count", type_name="user")
     print(result)
 
+Configuration File
+~~~~~~~~~~~~~~~~~~
+
+The ``config`` module includes utilities for reading configuration data from the 
+``.apidrc`` file. This provides a simple way to authenticate API calls without
+having to hard-code client_id and client_secret values.
+
+.. code-block:: python
+
+    from janrain.capture import Api, config
+    
+    client = config.default_client()
+    api = Api(client['apid_uri'], {
+        'client_id': client['client_id'],
+        'client_secret': client['client_secret']
+    })
+    result = api.call("entity.count", type_name="user")
+    print(result)
 
 Exceptions
 ~~~~~~~~~~
@@ -50,9 +68,13 @@ that call the Janrain API.
 .. code-block:: python
 
     try:
-       result = api.call("entity.find", type_name="user")
-    except janrain.capture.JanrainApiException as error:
-       sys.exit(error.message)
+        result = api.call("entity.find", type_name="user")
+    except janrain.capture.InvalidApiCallError as error:
+        # 404 error
+        sys.exit("Invalid API Endpoint: " + error.message)
+    except janrain.capture.ApiResponseError as error:
+        # API returned an error response
+        sys.exit("API Error: " + message)
 
 
 
