@@ -1,4 +1,7 @@
+""" Exceptions for the Janrain API library. """
+
 class JanrainApiException(Exception):
+    """ Base class for all Janrain API exceptions. """
     pass
 
 class InvalidApiCallError(JanrainApiException):
