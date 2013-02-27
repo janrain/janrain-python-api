@@ -43,8 +43,8 @@ Configuration File
 ~~~~~~~~~~~~~~~~~~
 
 The ``config`` module includes utilities for reading configuration data from the 
-``.apidrc`` file. This provides a simple way to authenticate API calls without
-having to hard-code client_id and client_secret values.
+``.janrain-capture`` file. This provides a simple way to authenticate API calls 
+without having to hard-code client_id and client_secret values.
 
 .. code-block:: python
 
@@ -83,7 +83,7 @@ Command-Line Utility
 The package installs an executable named ``capture-api`` for accessing making
 API calls from the command-line. 
 
-If you have the ``.apidrc`` configuration file, you can specify the client using
+If you have the ``.janrain-capture`` configuration file, you can specify the client using
 the ``--client`` argument. Otherwise you will need to specify ``--api-url``,
 ``--client-id``, and ``--client-secret``. 
 
@@ -93,7 +93,7 @@ argument.
 Examples
 ~~~~~~~~
 
-Using the client defined in ``.apidrc`` file::
+Using the client defined in ``.janrain-capture`` file::
  
     capture-api --client=demo entity.count --parameters type_name=user
 

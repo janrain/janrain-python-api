@@ -4,17 +4,21 @@ import os
 
 def read_config_file():
     """
-    Read the YAML configuration file named ``.apidrc`` and located in the
-    user's home directory.
+    Read the YAML configuration file named ``.janrain-capture`` and located in 
+    the user's home directory.
     
     Return:
         A Python structure representing the YAML.
     """
-    yaml_file = os.path.join(os.path.expanduser("~"), ".apidrc")
-    
-    with open(yaml_file) as stream:
-        config = yaml.load(stream.read())
-    
+    try:
+        yaml_file = os.path.join(os.path.expanduser("~"), ".janrain-capture")
+        with open(yaml_file) as stream:
+            config = yaml.load(stream.read())
+    except IOError as error:
+        # deprecated
+        yaml_file = os.path.join(os.path.expanduser("~"), ".apidrc")
+        with open(yaml_file) as stream:
+            config = yaml.load(stream.read())
     return config
         
 def default_client():
