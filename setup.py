@@ -30,7 +30,7 @@ setup(
         "Programming Language :: Python",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Internet :: WWW/HTTP",
-        # TODO: trove category for license
+        "License :: OSI Approved :: MIT License"
     ],
     test_suite = "janrain.capture.test"
 )
