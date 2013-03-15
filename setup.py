@@ -23,7 +23,7 @@ setup(
     scripts=[os.path.join("bin", script) for script in os.listdir("./bin")],
     #license = "",
     classifiers = [
-        "Development Status :: 1 - Planning",
+        "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
