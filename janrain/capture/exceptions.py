@@ -10,7 +10,7 @@ class InvalidApiCallError(JanrainApiException):
         message = "Invalid API call: {} ({})".format(api_call, status)
         JanrainApiException.__init__(self, message)
 
-class JanrainInvalidUrlError(Exception):
+class JanrainInvalidUrlError(JanrainApiException):
     """ Invalid URL. """
     pass
     
