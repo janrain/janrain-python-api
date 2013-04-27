@@ -1,0 +1,22 @@
+defaults:
+    default_client: test-client
+    unittest_client: test-client
+        
+clusters: 
+  dev: 
+    client_id: dev client_id
+    client_secret: dev client_secret
+
+clients:
+    test-client:
+        apid_uri: https://
+        client_id: test client_id
+        client_secret: test client_secret
+    cluster-client:
+        apid_uri: https://
+        cluster: dev
+
+some:
+    arbitrary:
+        path:
+            foo: bar
