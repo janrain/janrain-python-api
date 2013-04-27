@@ -4,3 +4,4 @@ __pycache__
 distribute-*
 build
 dist
+test.log
