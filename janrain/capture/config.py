@@ -2,66 +2,119 @@
 import yaml
 import os
 
-def read_config_file():
+def get_settings_at_path(dot_path):
     """
-    Read the YAML configuration file named ``.janrain-capture`` and located in 
-    the user's home directory.
+    Get the settings for the specified YAML path.
     
-    Return:
-        A Python structure representing the YAML.
+    Args:
+        dot_path - A YAML path string in dot-notation (Eg. "clusters.dev")
+    
+    Returns:
+        A dictionary containing the settings at the specified path.
+    
+    Raises:
+        KeyError if the path does not exist
     """
-    try:
-        yaml_file = os.path.join(os.path.expanduser("~"), ".janrain-capture")
-        with open(yaml_file) as stream:
-            config = yaml.load(stream.read())
-    except IOError as error:
-        # deprecated
-        yaml_file = os.path.join(os.path.expanduser("~"), ".apidrc")
-        with open(yaml_file) as stream:
-            config = yaml.load(stream.read())
-    return config
-        
+    yaml_dict = read_config_file()
+    current = yaml_dict
+    for chunk in dot_path.split('.'):
+        current = current.get(chunk, {})
+    if not current:
+        raise KeyError("Could not find key '{}' in '{}'" \
+                       .format(dot_path, get_config_file()))
+                       
+    return current
+    
 def default_client():
     """
-    Get the settings for the default client defined in the .apidrc file.
+    Get the settings for the default client defined in the config file.
     
     Returns:
         A dictionary containing the default client settings.
     """
     config = read_config_file()
-    return config['clients'][config['defaults']['default_client']]
+    try:
+        client_name = config['defaults']['default_client']
+    except KeyError:
+        raise KeyError("Could not find key 'unittest_client' in '{}'" \
+                       .format(get_config_file()))
+                       
+    return get_client(client_name)
 
-def cluster(cluster_name):
+def unittest_client():
     """
-    Get the client_id and client_secret defined for the specified cluster.
-    
-    Args:
-        cluster_name - The name of the cluster defined in the .apidrc file. 
-                       Eg. "prod".
+    Get the settings for the unittest client defined in the config file.
     
     Returns:
-        A dictionary containing the cluster settings.
+        A dictionary containing the default client settings.
     """
     config = read_config_file()
     try:
-        return config['clusters'][cluster_name]
-    except KeyError as error:
-        raise KeyError("A cluster named '{}' was not found in the config file" \
-                       .format(cluster_name))
+        client_name = config['defaults']['unittest_client']
+    except KeyError:
+        raise KeyError("Could not find key 'unittest_client' in '{}'" \
+                       .format(get_config_file()))
+                       
+    return get_client(client_name)
 
 def client(client_name):
+    """ DEPRECATED """
+    return get_client(client_name)
+    
+def get_client(client_name):
     """
     Get the settings defined for the specified client.
     
     Args:
-        client_name - The name of the client defined in the .apidrc file. 
+        client_name - The name of the client defined in the the config file
+    
+    Returns:
+        A dictionary containing the client settings.
+    """
+    client = get_settings_at_path("clients." + client_name)
+    if 'cluster' in client:
+        # merge in cluster values
+        cluster = get_cluster(client['cluster'])
+        client.update(cluster)
+        
+    return client
+
+def cluster(cluster_name):
+    """ DEPRECATED """
+    return get_cluster(cluster_name)
+                       
+def get_cluster(cluster_name):
+    """
+    Get the settings defined for the specified cluster.
+    
+    Args:
+        cluster_name - The name of the cluster defined in the config file
+                       (Eg. "prod" or "eu_staging")
     
     Returns:
         A dictionary containing the cluster settings.
     """
-    config = read_config_file()
+    return get_settings_at_path("clusters." + cluster_name)
+
+def get_config_file():
+    """
+    Get the full path to the config file. By default, this is a YAML file named 
+    `.janrain-capture`` located in the user's home directory. Override the 
+    default file by specifying a full path to a YAML file in the JANRAIN_CONFIG
+    environment variable.
+    """
     try:
-        return config['clients'][client_name]
-    except KeyError as error:
-        raise KeyError("A client named '{}' was not found in the config file" \
-                       .format(client_name))
+        return os.environ['JANRAIN_CONFIG']
+    except KeyError:
+        return os.path.join(os.path.expanduser("~"), ".janrain-capture")
+        
+def read_config_file():
+    """
+    Parse the YAML configuration file into Python types. 
+    
+    Returns:
+        A Python dictionary representing the YAML.
+    """
+    with open(get_config_file()) as stream:
+        config = yaml.load(stream.read())
+    return config
