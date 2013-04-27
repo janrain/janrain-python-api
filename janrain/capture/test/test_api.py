@@ -7,7 +7,7 @@ from janrain.capture.exceptions import *
 class TestApi(unittest.TestCase):
     """ Test the api module. """
     def setUp(self):
-        client = config.client("python_api_unittest")
+        client = config.unittest_client()
         self.api = Api(client['apid_uri'], {
             'client_id': client['client_id'],
             'client_secret': client['client_secret']
