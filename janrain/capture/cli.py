@@ -50,7 +50,7 @@ class ApiArgumentParser(ArgumentParser):
         self._parsed_args = args
         return self._parsed_args
         
-    def init_api(self):
+    def init_api(self, api_class=None):
         """
         Initialize a janrain.capture.Api() instance for the credentials that
         were specified on the command line or environment variables. This 
@@ -108,7 +108,10 @@ class ApiArgumentParser(ArgumentParser):
         
         defaults = {k: credentials[k] for k in ('client_id', 'client_secret')}
         
-        return Api(credentials['apid_uri'], defaults)
+        if api_class:
+            return api_class(credentials['apid_uri'], defaults)
+        else:
+            return Api(credentials['apid_uri'], defaults)
         
 
 def main():

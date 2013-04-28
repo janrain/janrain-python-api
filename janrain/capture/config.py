@@ -1,7 +1,7 @@
 """ Utilities for working with the Janrain API configuration file. """
 import yaml
 import os
-from janrain.capture import JanrainConfigError
+from janrain.capture.exceptions import JanrainConfigError
 
 def get_settings_at_path(dot_path):
     """
