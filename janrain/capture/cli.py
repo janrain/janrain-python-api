@@ -1,62 +1,132 @@
-""" Command-line utility for interfacing with the Janrain API. """
+""" Command-line functions for interfacing with the Janrain API. """
 # pylint: disable=C0301,W0142
 import sys
-import argparse
+import os
 import json
+from argparse import ArgumentParser, ArgumentError
 from janrain.capture import Api, config, ApiResponseError
 
-import logging
-logging.basicConfig(level=logging.DEBUG)
+class ApiArgumentParser(ArgumentParser):
+    """
+    A subclass of the argparse.ArgumentParser in the standard library. Adds the
+    common command-line options for authenticating with the Janrain API and 
+    allows for an janrain.capture.Api instance to be initialized using those
+    credentials.
+    
+    Example:
+        
+        parser = janrain.capture.cli.ApiArgumentParser()
+        args = parser.parse_args()
+        api = parser.init_api()
+        
+    """
+    def __init__(self, *args, **kwargs):
+        super(ApiArgumentParser, self).__init__(*args, **kwargs)
+        self._parsed_args = None
+        
+        # credentials explicitly specified on the command line
+        self.add_argument('-u', '--apid_uri', 
+                          help="Full URI to the Capture API domain.")
+        self.add_argument('-i', '--client-id',
+                          help="authenticate with a specific client_id.")
+        self.add_argument('-s', '--client-secret',
+                          help="authenticate with a specific client_secret.")
+        
+        # credentials defined in config file at the specified path
+        self.add_argument('-k', '--config-key',
+                          help="authenticate using the credentials defined at "\
+                               "a specific path in the configuration file "    \
+                               "(eg. clients.demo).")
+    
+        # default client found in the configuration file
+        self.add_argument('-d', '--default-client', action='store_true',
+                          help="authenticate using the default client defined "\
+                               "in the configuration file.")  
+    
+    def parse_args(self, args=None, namespace=None):
+        # override to store the result which can later be used by init_api()
+        args = super(ApiArgumentParser, self).parse_args(args, namespace)
+        self._parsed_args = args
+        return self._parsed_args
+        
+    def init_api(self):
+        """
+        Initialize a janrain.capture.Api() instance for the credentials that
+        were specified on the command line or environment variables. This 
+        method will use the first credentials it finds, looking in the 
+        following order:
+        
+        1. A client_id and client_secret specified on the command line
+        2. A configuration key specified on the command line
+        3. The default client as specified with a flag on the command line
+        4. The CAPTURE_CLIENT_ID and CAPTURE_CLIENT_SECRET environment vars 
+        
+        Returns:
+            A janrain.capture.Api instance
+        
+        """
+        if not self._parsed_args:
+            raise Exception("You must call the parse_args() method before " \
+                            "the init_api() method.")
+            
+        args = self._parsed_args
+        
+        if args.client_id and args.client_secret:
+            credentials = {
+                'client_id': args['client_id'],
+                'client_id': args['client_secret']
+            }
+            
+        elif args.config_key:
+            credentials = config.get_settings_at_path(args.config_key)
+            
+        elif args.default_client:
+            credentials = config.default_client()
+            
+        elif 'CAPTURE_CLIENT_ID' in os.environ \
+            and 'CAPTURE_CLIENT_SECRET' in os.environ:
+            credentials = {
+                'client_id': os.environ['CAPTURE_CLIENT_ID'],
+                'client_id': os.environ['CAPTURE_CLIENT_SECRET']
+            }
+            
+        else:
+            raise ArgumentError(None, "You have not specified credentials to " \
+                                      "authenticate with the Capture API.")
+        
+        if args.apid_uri:
+            credentials['apid_uri'] = args.apid_uri
+            
+        elif 'apid_uri' not in credentials:
+            if 'CAPTURE_APID_URI' in os.environ:
+                credentials['apid_uri'] = os.environ['CAPTURE_APID_URI']
+            else:
+                raise ArgumentError(None, "You have not specified the " \
+                                          "URL to the Capture API.")
+        
+        defaults = {k: credentials[k] for k in ('client_id', 'client_secret')}
+        
+        return Api(credentials['apid_uri'], defaults)
+        
 
-def parse_args():
-    """
-    Return populated argument parser namespace.
-    """
-    parser = argparse.ArgumentParser()
-    
-    parser.add_argument('-c', '--client',
-                        help="Use the settings defined in the .apidrc file for a specific client.")
-    parser.add_argument('-u', '--api_url', 
-                        help="The full URL to the apid server.")
-    parser.add_argument('-i', '--client-id',
-                        help="The client_id to use when making the API call.")
-    parser.add_argument('-s', '--client-secret',
-                        help="The client_secret to use when making the API call.")
-    parser.add_argument('api_call', 
-                        help="The API endpoint to call.")
-    parser.add_argument('-p', '--parameters', nargs='*', metavar="parameter=value",
-                        help="parameters passed on to the API call")
-    return parser.parse_args()
-    
 def main():
     """
     Main entry point for CLI. This may be called by running the module directly
     or by an executable installed onto the system path.
     """
-    args = parse_args()
+    parser = ApiArgumentParser()
+    parser.add_argument('api_call', 
+                        help="API endpoint expressed as a relative path (eg. /settings/get).")
+    parser.add_argument('-p', '--parameters', nargs='*', metavar="parameter=value",
+                        help="parameters passed through to the API call.")
+    args = parser.parse_args()
     
-    # Get authentication which should either be a cluster defined in the 
-    # .apidrc or an explicity passed client_id and client_secret
-    if args.client:
-        try:
-            client = config.client(args.client)
-        except KeyError as error:
-            sys.exit(str(error))
-        defaults = {
-            'client_id': client['client_id'],
-            'client_secret': client['client_secret']
-        }
-        api_url = client['apid_uri']
-    elif args.client_id and args.client_secret and args.api_url:
-        defaults = {
-            'client_id': args.client_id, 
-            'client_secret': args.client_secret
-        }
-        api_url = args.api_url
-    else:
-        sys.exit("You must pass --client as defined in the .apidrc file " \
-                 "or pass --api-url, --client-id, and --client-secret.")   
-    api = Api(api_url, defaults)
+    try:
+        api = parser.init_api()
+    except KeyError as error:
+        sys.exit(error.message)
+    except ArgumentError as error:
+        sys.exit(str(error))
     
     # map list of parameters from command line into a dict for use as kwargs
     kwargs = {}
