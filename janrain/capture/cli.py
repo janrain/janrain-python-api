@@ -4,7 +4,8 @@ import sys
 import os
 import json
 from argparse import ArgumentParser, ArgumentError
-from janrain.capture import Api, config, ApiResponseError
+from janrain.capture import Api, config, ApiResponseError, \
+                            JanrainCredentialsError, JanrainConfigError
 
 class ApiArgumentParser(ArgumentParser):
     """
@@ -91,8 +92,9 @@ class ApiArgumentParser(ArgumentParser):
             }
             
         else:
-            raise ArgumentError(None, "You have not specified credentials to " \
-                                      "authenticate with the Capture API.")
+            message = "You did not specify credentials to authenticate " \
+                      "with the Capture API."
+            raise JanrainCredentialsError(message)
         
         if args.apid_uri:
             credentials['apid_uri'] = args.apid_uri
@@ -101,8 +103,8 @@ class ApiArgumentParser(ArgumentParser):
             if 'CAPTURE_APID_URI' in os.environ:
                 credentials['apid_uri'] = os.environ['CAPTURE_APID_URI']
             else:
-                raise ArgumentError(None, "You have not specified the " \
-                                          "URL to the Capture API.")
+                message = "You did not specify the URL to the Capture API."
+                raise JanrainCredentialsError(message)
         
         defaults = {k: credentials[k] for k in ('client_id', 'client_secret')}
         
@@ -123,10 +125,8 @@ def main():
     
     try:
         api = parser.init_api()
-    except KeyError as error:
+    except (JanrainConfigError, JanrainCredentialsError) as error:
         sys.exit(error.message)
-    except ArgumentError as error:
-        sys.exit(str(error))
     
     # map list of parameters from command line into a dict for use as kwargs
     kwargs = {}

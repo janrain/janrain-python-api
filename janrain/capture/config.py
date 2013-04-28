@@ -1,6 +1,7 @@
 """ Utilities for working with the Janrain API configuration file. """
 import yaml
 import os
+from janrain.capture import JanrainConfigError
 
 def get_settings_at_path(dot_path):
     """
@@ -20,8 +21,8 @@ def get_settings_at_path(dot_path):
     for chunk in dot_path.split('.'):
         current = current.get(chunk, {})
     if not current:
-        raise KeyError("Could not find key '{}' in '{}'." \
-                       .format(dot_path, get_config_file()))
+        raise JanrainConfigError("Could not find key '{}' in '{}'." \
+                                 .format(dot_path, get_config_file()))
                        
     return current
     
@@ -36,8 +37,9 @@ def default_client():
     try:
         client_name = config['defaults']['default_client']
     except KeyError:
-        raise KeyError("Could not find key 'unittest_client' in '{}'." \
-                       .format(get_config_file()))
+        message = "Could not find key 'default_client' in '{}'." \
+                  .format(get_config_file())
+        raise JanrainConfigError(message)
                        
     return get_client(client_name)
 
@@ -52,8 +54,9 @@ def unittest_client():
     try:
         client_name = config['defaults']['unittest_client']
     except KeyError:
-        raise KeyError("Could not find key 'unittest_client' in '{}'." \
-                       .format(get_config_file()))
+        message = "Could not find key 'unittest_client' in '{}'." \
+                  .format(get_config_file())
+        raise JanrainConfigError(message)
                        
     return get_client(client_name)
 

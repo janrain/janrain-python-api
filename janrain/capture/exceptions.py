@@ -4,6 +4,14 @@ class JanrainApiException(Exception):
     """ Base class for all Janrain API exceptions. """
     pass
 
+class JanrainCredentialsError(Exception):
+    """ Exception for credential errors (eg. Missing credentials) """
+    pass
+
+class JanrainConfigError(Exception):
+    """ Exception for credential configuration file errors """
+    pass
+    
 class InvalidApiCallError(JanrainApiException):
     """ Request for a non-existing API call. """
     def __init__(self, api_call, status):
