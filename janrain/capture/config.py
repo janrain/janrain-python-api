@@ -23,7 +23,7 @@ def get_settings_at_path(dot_path):
     if not current:
         raise JanrainConfigError("Could not find key '{}' in '{}'." \
                                  .format(dot_path, get_config_file()))
-                       
+    merge_cluster(current)                   
     return current
     
 def default_client():
@@ -75,10 +75,7 @@ def get_client(client_name):
         A dictionary containing the client settings.
     """
     client = get_settings_at_path("clients." + client_name)
-    if 'cluster' in client:
-        # merge in cluster values
-        cluster = get_cluster(client['cluster'])
-        client.update(cluster)
+    merge_cluster(client)
         
     return client
 
@@ -110,6 +107,18 @@ def get_config_file():
         return os.environ['JANRAIN_CONFIG']
     except KeyError:
         return os.path.join(os.path.expanduser("~"), ".janrain-capture")
+
+def merge_cluster(settings):
+    """
+    Merge the cluster settings into the dictionary if a 'clusters' key exists.
+    
+    Args:
+        settings - The settings to dictionary to merge cluster setings into.
+    """
+    if 'cluster' in settings:
+        # merge in cluster values
+        cluster = get_cluster(settings['cluster'])
+        settings.update(cluster)
         
 def read_config_file():
     """
