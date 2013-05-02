@@ -8,13 +8,19 @@ Python interface to the
 Install
 -------
 
-Download the package by cloning the git repository::
+Download and install the most recent stable version using ``pip`` (preferred)::
+
+    pip install janrain-python-api
+
+... or using (``easy_install``)::
+
+    easy_install janrain-python-api
+
+
+To use the unstable developement version, download the package by cloning the git repository::
 
     git clone https://github.com/janrain/janrain-python-api.git
     cd janrain-python-api
-
-Then install it using ``setup.py``::
-
     python setup.py install
     
 
@@ -28,35 +34,17 @@ Use ``janrain.capture.Api`` to make low-level calls to the API.
 
 .. code-block:: python
 
-    import janrain.capture.Api
+    from janrain.capture import Api
     
     defaults = {
         'client_id': "YOUR_CLIENT_ID", 
         'client_secret': "YOUR_CLIENT_SECRET"
     }
     
-    api = janrain.capture.Api("http://YOUR_APP.janraincapture.com", defaults)
+    api = Api("http://YOUR_APP.janraincapture.com", defaults)
     result = api.call("entity.count", type_name="user")
     print(result)
 
-Configuration File
-~~~~~~~~~~~~~~~~~~
-
-The ``config`` module includes utilities for reading configuration data from the 
-``.janrain-capture`` file. This provides a simple way to authenticate API calls 
-without having to hard-code client_id and client_secret values.
-
-.. code-block:: python
-
-    from janrain.capture import Api, config
-    
-    client = config.default_client()
-    api = Api(client['apid_uri'], {
-        'client_id': client['client_id'],
-        'client_secret': client['client_secret']
-    })
-    result = api.call("entity.count", type_name="user")
-    print(result)
 
 Exceptions
 ~~~~~~~~~~
@@ -74,28 +62,21 @@ that call the Janrain API.
         sys.exit("Invalid API Endpoint: " + error.message)
     except janrain.capture.ApiResponseError as error:
         # API returned an error response
-        sys.exit("API Error: " + message)
+        sys.exit("API Error: " + error.message)
 
 
 Command-Line Utility
 --------------------
 
-The package installs an executable named ``capture-api`` for accessing making
+The package installs an executable named ``capture-api`` for making
 API calls from the command-line. 
 
-If you have the ``.janrain-capture`` configuration file, you can specify the client using
-the ``--client`` argument. Otherwise you will need to specify ``--api-url``,
-``--client-id``, and ``--client-secret``. 
-
-All parameters should be passed as key=value pairs after the ``--parameters``
-argument. 
+Authenticate with the API by passing ``--api-url``, ``--client-id``, 
+and ``--client-secret``, then pass the API call, and then any parameters to
+send to the API as key=value pairs after the ``--parameters`` argument. 
 
 Examples
 ~~~~~~~~
-
-Using the client defined in ``.janrain-capture`` file::
- 
-    capture-api --client=demo entity.count --parameters type_name=user
 
 Passing the authentication credentials::
 
@@ -106,12 +87,18 @@ Passing the authentication credentials::
 
 Enclose JSON values in single outer-quotes and double inner-quotes::
 
-    capture-api --client=demo entity.find --parameters type_name=user \
+    capture-api --api-url=[YOUR_CAPTURE_URL] \
+                --client-id=[YOUR_CLIENT_ID] \
+                --client-secret=[YOUR_CLIENT_SECRET] \
+                entity.find --parameters type_name=user \
                 attributes='["displayName","email"]'
 
 Enclose filters in double outer-quotes and single inner-quotes::
 
-    capture-api --client=demo entity.find --parameters type_name=user \
+        capture-api --api-url=[YOUR_CAPTURE_URL] \
+                --client-id=[YOUR_CLIENT_ID] \
+                --client-secret=[YOUR_CLIENT_SECRET] \
+                entity.find --parameters type_name=user \
                 filter="email = 'demo@janrain.com' and birthday is null"
 
 ----
