@@ -96,6 +96,15 @@ def get_cluster(cluster_name):
     """
     return get_settings_at_path("clusters." + cluster_name)
 
+def get_clusters():
+    """
+    Get the list of all clusters.
+    
+    Returns:
+        A dictionary containing the cluster settings.
+    """
+    return get_settings_at_path("clusters")
+
 def get_config_file():
     """
     Get the full path to the config file. By default, this is a YAML file named 
