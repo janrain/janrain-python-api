@@ -122,8 +122,11 @@ class Api(object):
         
         if data['stat'] == 'error':
             self.logger.debug("Response:\n" + json_encode(data, indent=4))
-            raise ApiResponseError(data['code'], data['error'], 
-                                   data['error_description'], data)
+            try:
+                message = data['error_description']
+            except KeyError:
+                message = data['message']
+            raise ApiResponseError(data['code'], data['error'], message, data)
         return data
         
     def sign_request(self, request, api_call, params):
