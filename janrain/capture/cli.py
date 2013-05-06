@@ -74,8 +74,8 @@ class ApiArgumentParser(ArgumentParser):
         
         if args.client_id and args.client_secret:
             credentials = {
-                'client_id': args['client_id'],
-                'client_id': args['client_secret']
+                'client_id': args.client_id,
+                'client_secret': args.client_secret
             }
             
         elif args.config_key:
@@ -88,7 +88,7 @@ class ApiArgumentParser(ArgumentParser):
             and 'CAPTURE_CLIENT_SECRET' in os.environ:
             credentials = {
                 'client_id': os.environ['CAPTURE_CLIENT_ID'],
-                'client_id': os.environ['CAPTURE_CLIENT_SECRET']
+                'client_secret': os.environ['CAPTURE_CLIENT_SECRET']
             }
             
         else:
