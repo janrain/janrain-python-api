@@ -3,8 +3,8 @@
 import sys
 import os
 import json
-from argparse import ArgumentParser, ArgumentError
-from janrain.capture import Api, config, ApiResponseError, \
+from argparse import ArgumentParser, ArgumentError, HelpFormatter
+from janrain.capture import Api, config, get_version, ApiResponseError, \
                             JanrainCredentialsError, JanrainConfigError
 
 class ApiArgumentParser(ArgumentParser):
@@ -27,22 +27,22 @@ class ApiArgumentParser(ArgumentParser):
         
         # credentials explicitly specified on the command line
         self.add_argument('-u', '--apid_uri', 
-                          help="Full URI to the Capture API domain.")
+                          help="Full URI to the Capture API domain")
         self.add_argument('-i', '--client-id',
-                          help="authenticate with a specific client_id.")
+                          help="authenticate with a specific client_id")
         self.add_argument('-s', '--client-secret',
-                          help="authenticate with a specific client_secret.")
+                          help="authenticate with a specific client_secret")
         
         # credentials defined in config file at the specified path
         self.add_argument('-k', '--config-key',
                           help="authenticate using the credentials defined at "\
                                "a specific path in the configuration file "    \
-                               "(eg. clients.demo).")
+                               "(eg. clients.demo)")
     
         # default client found in the configuration file
         self.add_argument('-d', '--default-client', action='store_true',
                           help="authenticate using the default client defined "\
-                               "in the configuration file.")  
+                               "in the configuration file")  
     
     def parse_args(self, args=None, namespace=None):
         # override to store the result which can later be used by init_api()
@@ -103,7 +103,7 @@ class ApiArgumentParser(ArgumentParser):
             if 'CAPTURE_APID_URI' in os.environ:
                 credentials['apid_uri'] = os.environ['CAPTURE_APID_URI']
             else:
-                message = "You did not specify the URL to the Capture API."
+                message = "You did not specify the URL to the Capture API"
                 raise JanrainCredentialsError(message)
         
         defaults = {k: credentials[k] for k in ('client_id', 'client_secret')}
@@ -119,11 +119,15 @@ def main():
     Main entry point for CLI. This may be called by running the module directly
     or by an executable installed onto the system path.
     """
-    parser = ApiArgumentParser()
+    parser = ApiArgumentParser(formatter_class=lambda prog: HelpFormatter(prog,max_help_position=30))
     parser.add_argument('api_call', 
-                        help="API endpoint expressed as a relative path (eg. /settings/get).")
-    parser.add_argument('-p', '--parameters', nargs='*', metavar="parameter=value",
-                        help="parameters passed through to the API call.")
+                        help="API endpoint expressed as a relative path " \
+                             "(eg. /settings/get).")
+    parser.add_argument('-p', '--parameters', nargs='*', 
+                        metavar="parameter=value",
+                        help="parameters passed through to the API call")
+    parser.add_argument('-v', '--version', action='version', 
+                        version="capture-api " + get_version())
     args = parser.parse_args()
     
     try:
