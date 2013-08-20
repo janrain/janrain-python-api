@@ -45,7 +45,7 @@ class Api(object):
         api = janrain.capture.Api("https://...", defaults)
         count = api.call("entity.count", type_name="user")
     """
-    def __init__(self, api_url, defaults=None):
+    def __init__(self, api_url, defaults={}):
         self.logger = logging.getLogger(__name__)
         if api_url[0:4] == "http":
             self.api_url = api_url
