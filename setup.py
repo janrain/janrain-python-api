@@ -11,7 +11,7 @@ def read(fname):
 from janrain.capture import get_version
 
 setup(
-    name = "janrain-python-api", 
+    name = "janrain-python-api",
     version = get_version(),
     description = "Python interface to the Janrain Capture API.",
     long_description = read("README.rst"),
@@ -23,7 +23,7 @@ setup(
     scripts=[os.path.join("bin", script) for script in os.listdir("./bin")],
     #license = "",
     classifiers = [
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Operating System :: OS Independent",
