@@ -86,6 +86,12 @@ class Api(object):
         request = Request(url)
         if self.sign_requests:
             self.sign_request(request, api_call, params)
+
+        print_params = params.copy()
+        if 'client_secret' in print_params:
+            print_params['client_secret'] = "CLIENT_SECRET_REMOVED"
+        self.logger.debug(urlencode(print_params))
+
         request.add_data(urlencode(params))
 
         try:
@@ -147,8 +153,6 @@ class Api(object):
         access_token = params.pop('access_token', None)
         client_id = params.pop('client_id', None)
         client_secret = params.pop('client_secret', None)
-
-        self.logger.debug(params)
 
         # create the authorization header
         if access_token:

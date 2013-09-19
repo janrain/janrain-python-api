@@ -3,6 +3,7 @@
 import sys
 import os
 import json
+import logging
 from argparse import ArgumentParser, ArgumentError, HelpFormatter
 from janrain.capture import Api, config, get_version, ApiResponseError, \
                             JanrainCredentialsError, JanrainConfigError
@@ -128,13 +129,23 @@ def main():
                         help="parameters passed through to the API call")
     parser.add_argument('-v', '--version', action='version', 
                         version="capture-api " + get_version())
+    parser.add_argument('-x', '--disable-signed-requests', action='store_true',
+                        help="sign HTTP requests")
+    parser.add_argument('-b', '--debug', action='store_true',
+                        help="log debug messages to stdout")
     args = parser.parse_args()
     
     try:
         api = parser.init_api()
     except (JanrainConfigError, JanrainCredentialsError) as error:
         sys.exit(error.message)
-    
+
+    if args.disable_signed_requests:
+        api.sign_requests = False
+
+    if args.debug:
+        logging.basicConfig(level=logging.DEBUG)
+        
     # map list of parameters from command line into a dict for use as kwargs
     kwargs = {}
     if args.parameters:
@@ -144,7 +155,7 @@ def main():
     try:
         data = api.call(args.api_call, **kwargs)
     except ApiResponseError as error:
-        sys.exit("Error {} - {}\n".format(error.code, error.message))
+        sys.exit("API Error {} - {}\n".format(error.code, error.message))
     except Exception as error:
         sys.exit("Error - {}\n".format(error))
     
