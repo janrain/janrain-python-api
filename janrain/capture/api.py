@@ -104,11 +104,6 @@ class Api(object):
                 raise InvalidApiCallError(api_call, error.code)
             else:
                 raise error
-        except URLError as error:
-            if error.reason.errno == -2:
-                raise JanrainInvalidUrlError("Invalid API URL: " + url)
-            else:
-                raise error
 
         return self.parse_response(body)
 
