@@ -34,14 +34,14 @@ Use ``janrain.capture.Api`` to make low-level calls to the API.
 
 .. code-block:: python
 
-    from janrain.capture import Api
+    from janrain.capture import api as Api
     
     defaults = {
         'client_id': "YOUR_CLIENT_ID", 
         'client_secret': "YOUR_CLIENT_SECRET"
     }
     
-    api = Api("http://YOUR_APP.janraincapture.com", defaults)
+    api = Api("https://YOUR_APP.janraincapture.com", defaults)
     result = api.call("entity.count", type_name="user")
     print(result)
 
@@ -103,4 +103,4 @@ Enclose filters in double outer-quotes and single inner-quotes::
 
 ----
 
-Copyright © 2013 Janrain, Inc. All Rights Reserved.
+Copyright © 2014 Janrain, Inc. All Rights Reserved.
