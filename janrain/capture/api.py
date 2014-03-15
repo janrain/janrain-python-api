@@ -12,6 +12,8 @@ from hashlib import sha1
 import hmac
 import time
 import logging
+import gzip
+from StringIO import StringIO
 
 #logging.basicConfig()
 
@@ -45,7 +47,7 @@ class Api(object):
         api = janrain.capture.Api("https://...", defaults)
         count = api.call("entity.count", type_name="user")
     """
-    def __init__(self, api_url, defaults={}):
+    def __init__(self, api_url, defaults={},compress=False):
         self.logger = logging.getLogger(__name__)
         if api_url[0:4] == "http":
             self.api_url = api_url
@@ -53,6 +55,7 @@ class Api(object):
             self.api_url = "https://" + api_url
         self.defaults = defaults
         self.sign_requests = True
+        self.compress = compress
 
     def call(self, api_call, **kwargs):
         """
@@ -93,10 +96,17 @@ class Api(object):
         self.logger.debug(urlencode(print_params))
 
         request.add_data(urlencode(params))
+        if self.compress:
+           request.add_header('Accept-encoding', 'gzip')
 
         try:
             with closing(urlopen(request)) as response:
-                body = response.read()
+                if response.info().get('Content-Encoding') == 'gzip':
+                   buf = StringIO( response.read())
+                   f = gzip.GzipFile(fileobj=buf)
+                   body = f.read()
+                else:
+                   body = response.read()
         except HTTPError as error:
             if error.code in (400, 401): # /oauth/token returns 400 or 401
                 body = error.fp.read()
