@@ -143,6 +143,9 @@ class Api(object):
             api_call - The API endpoint as a relative URL.
             params   - A dictionary of parameters in the POST to the API.
         """
+        for key, value in params.items():
+            params[key] = value.encode('utf-8')
+
         # Do not POST authentication parameters. Use them to create an
         # authentication header instead.
         access_token = params.pop('access_token', None)
