@@ -2,8 +2,14 @@
 # pylint: disable=E0611
 from janrain.capture.exceptions import InvalidApiCallError, ApiResponseError, \
                                        JanrainInvalidUrlError
-from urllib import urlencode
-from urllib2 import Request, urlopen, HTTPError, URLError
+try:
+    from urllib import urlencode
+    from urllib2 import Request, urlopen, HTTPError, URLError
+    from StringIO import StringIO
+except ImportError:
+    from urllib.parse import urlencode
+    from urllib.request import Request, urlopen, HTTPError, URLError
+    from io import StringIO
 from json import loads as json_decode
 from json import dumps as json_encode
 from contextlib import closing
@@ -13,7 +19,6 @@ import hmac
 import time
 import logging
 import gzip
-from StringIO import StringIO
 
 #logging.basicConfig()
 
