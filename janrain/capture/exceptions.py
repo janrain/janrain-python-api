@@ -11,7 +11,7 @@ class JanrainCredentialsError(Exception):
 class JanrainConfigError(Exception):
     """ Exception for credential configuration file errors """
     pass
-    
+
 class InvalidApiCallError(JanrainApiException):
     """ Request for a non-existing API call. """
     def __init__(self, api_call, status):
@@ -21,7 +21,7 @@ class InvalidApiCallError(JanrainApiException):
 class JanrainInvalidUrlError(JanrainApiException):
     """ Invalid URL. """
     pass
-    
+
 class ApiResponseError(JanrainApiException):
     """ An error response from the capture API. """
     def __init__(self, code, error, error_description, response):

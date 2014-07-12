@@ -1,9 +1,9 @@
 defaults:
     default_client: test-client
     unittest_client: test-client
-        
-clusters: 
-  dev: 
+
+clusters:
+  dev:
     client_id: dev client_id
     client_secret: dev client_secret
 
