@@ -156,8 +156,6 @@ def main():
         data = api.call(args.api_call, **kwargs)
     except ApiResponseError as error:
         sys.exit("API Error {} - {}\n".format(error.code, error.message))
-    except Exception as error:
-        sys.exit("Error - {}\n".format(error))
 
     print(json.dumps(data, indent=2, sort_keys=True))
 
