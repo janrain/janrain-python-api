@@ -2,16 +2,23 @@
 # pylint: disable=E0611
 from janrain.capture.exceptions import InvalidApiCallError, ApiResponseError
 from json import dumps as to_json
-from simplejson.scanner import JSONDecodeError
 from contextlib import closing
 from base64 import b64encode
 from hashlib import sha1
 import hmac
 import time
 import logging
-import requests
 
 logger = logging.getLogger(__name__)
+
+# Use a try/catch when importing requests so that the setup.py script can still
+# import from __init__.py without failing.
+try:
+    import requests
+except ImportError:
+    logger.warn("Missing 'requests' module. Install using 'pip install " \
+                "requests'.")
+
 
 def api_encode(value):
     """
@@ -174,5 +181,5 @@ class Api(object):
                 # /oauth/token returns 400 or 401
                 r.raise_for_status()
             return r.json()
-        except JSONDecodeError:
+        except ValueError:
             r.raise_for_status()
