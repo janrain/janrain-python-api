@@ -6,7 +6,8 @@ import json
 import logging
 from argparse import ArgumentParser, ArgumentError, HelpFormatter
 from janrain.capture import Api, config, get_version, ApiResponseError, \
-                            JanrainCredentialsError, JanrainConfigError
+                            JanrainCredentialsError, JanrainConfigError, \
+                            InvalidApiCallError
 
 class ApiArgumentParser(ArgumentParser):
     """
@@ -156,6 +157,8 @@ def main():
         data = api.call(args.api_call, **kwargs)
     except ApiResponseError as error:
         sys.exit("API Error {} - {}\n".format(error.code, error.message))
+    except InvalidApiCallError as error:
+        sys.exit(error.message)
 
     print(json.dumps(data, indent=2, sort_keys=True))
 

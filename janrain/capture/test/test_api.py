@@ -7,7 +7,7 @@ from janrain.capture.exceptions import *
 class TestApi(unittest.TestCase):
     """ Test the api module. """
     def setUp(self):
-        client = config.unittest_client()
+        client = config.get_client('janrain-capture-api-unittest')
         self.api = Api(client['apid_uri'], {
             'client_id': client['client_id'],
             'client_secret': client['client_secret']
@@ -30,8 +30,6 @@ class TestApi(unittest.TestCase):
         result = self.api.call("entity.count", type_name="user")
         self.assertTrue("stat" in result)
 
-        # oauth/token returns 400 or 401 which should *not* be a URLError
+        # oauth/token returns 400 or 401 which should *not* be a HTTPError
         with self.assertRaises(ApiResponseError):
             self.api.call("/oauth/token")
-
-

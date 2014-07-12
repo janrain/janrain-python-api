@@ -32,5 +32,8 @@ setup(
         "Topic :: Internet :: WWW/HTTP",
         "License :: OSI Approved :: MIT License"
     ],
-    test_suite = "janrain.capture.test"
+    test_suite = "janrain.capture.test",
+    install_requires = [
+        'requests'
+    ]
 )
