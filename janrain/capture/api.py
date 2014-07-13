@@ -52,10 +52,6 @@ def generate_signature(api_call, unsigned_params):
         """
         params = unsigned_params.copy()
 
-        # UTF-8 encode (corrects encoding issues when used with Flask/Django)
-        for key, value in params.items():
-            params[key] = value.encode('utf-8')
-
         # Do not POST authentication parameters. Use them to create an
         # authentication header instead.
         access_token = params.pop('access_token', None)
@@ -70,15 +66,17 @@ def generate_signature(api_call, unsigned_params):
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
             data = "{}\n{}\n".format(api_call, timestamp)
             if params:
-                kv_str = ["{}={}".format(k, v) for k, v in params.iteritems()]
+                kv_str = ["{}={}".format(k, v.decode('utf-8'))
+                    for k, v in params.items()]
                 kv_str.sort()
                 data = data + "\n".join(kv_str) + "\n"
-            sha1_str = hmac.new(client_secret, data, sha1).digest()
+            sha1_str = hmac.new(client_secret, data.encode(), sha1).digest()
             hash_str = b64encode(sha1_str)
             headers['Date'] = timestamp
-            headers['Authorization'] = "Signature {}:{}" \
-                .format(client_id, hash_str)
-            logger.debug("Signature {}:{}".format(client_id, hash_str))
+            signature = "Signature {}:{}".format(client_id.decode("utf-8"), \
+                                                 hash_str.decode("utf-8"))
+            headers['Authorization'] = signature
+            logger.debug(signature)
 
         return headers, params
 
@@ -146,8 +144,11 @@ class Api(object):
         """
         # Encode values for the API (JSON, bools, nulls)
         params = dict((key, api_encode(value))
-            for key, value in kwargs.iteritems() if value is not None)
+            for key, value in kwargs.items() if value is not None)
         params.update(self.defaults)
+
+        for key, value in params.items():
+            params[key] = value.encode('utf-8')
 
         if api_call[0] !=  "/":
             api_call = "/" + api_call
