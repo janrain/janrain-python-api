@@ -172,8 +172,8 @@ class Api(object):
         if self.compress:
            headers['Accept-encoding'] = 'gzip'
 
-        # TODO: requests goes here!
-        #try:
+        # Let any exceptions here get raised to the calling code. This includes
+        # things like connection errors and timeouts.
         r = requests.post(url, headers=headers, data=params)
 
         try:
@@ -183,4 +183,5 @@ class Api(object):
                 r.raise_for_status()
             return r.json()
         except ValueError:
+            # The response was not valid JSON (empty body, 5xx errors, etc.)
             r.raise_for_status()
