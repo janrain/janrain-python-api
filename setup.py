@@ -40,5 +40,8 @@ setup(
     install_requires = [
         'requests',
         'pyyaml',
-    ]
+    ],
+    setup_requires=[
+        'Nose',
+    ],
 )
