@@ -6,7 +6,8 @@ import json
 import logging
 from argparse import ArgumentParser, ArgumentError, HelpFormatter
 from janrain.capture import Api, config, get_version, ApiResponseError, \
-                            JanrainCredentialsError, JanrainConfigError
+                            JanrainCredentialsError, JanrainConfigError, \
+                            InvalidApiCallError
 
 class ApiArgumentParser(ArgumentParser):
     """
@@ -138,7 +139,7 @@ def main():
     try:
         api = parser.init_api()
     except (JanrainConfigError, JanrainCredentialsError) as error:
-        sys.exit(error.message)
+        sys.exit(str(error))
 
     if args.disable_signed_requests:
         api.sign_requests = False
@@ -155,9 +156,9 @@ def main():
     try:
         data = api.call(args.api_call, **kwargs)
     except ApiResponseError as error:
-        sys.exit("API Error {} - {}\n".format(error.code, error.message))
-    except Exception as error:
-        sys.exit("Error - {}\n".format(error))
+        sys.exit("API Error {} - {}\n".format(error.code, str(error)))
+    except InvalidApiCallError as error:
+        sys.exit(str(error))
 
     print(json.dumps(data, indent=2, sort_keys=True))
 

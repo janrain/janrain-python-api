@@ -1,6 +1,6 @@
 import unittest
 import os
-from janrain.capture import Api, config
+from janrain.capture import Api, config, JanrainConfigError
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
@@ -26,7 +26,6 @@ class TestConfig(unittest.TestCase):
         # test convenience funcitons for getting defaults
         clients = []
         clients.append(config.default_client())
-        clients.append(config.unittest_client())
         for client in clients:
             self.assertIn('client_id', client)
             self.assertIn('client_secret', client)
@@ -37,7 +36,7 @@ class TestConfig(unittest.TestCase):
         client = config.get_settings_at_path("some.arbitrary.path")
         self.assertEqual(client['foo'], "bar")
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(JanrainConfigError):
             config.get_settings_at_path("foo.bar")
 
     def tearDown(self):

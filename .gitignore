@@ -5,3 +5,4 @@ distribute-*
 build
 dist
 test.log
+venv

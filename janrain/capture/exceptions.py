@@ -14,12 +14,14 @@ class JanrainConfigError(Exception):
 
 class InvalidApiCallError(JanrainApiException):
     """ Request for a non-existing API call. """
+    # DEPRECATED (bad API calls include an error in the JSON response)
     def __init__(self, api_call, status):
         message = "Invalid API call: {} ({})".format(api_call, status)
         JanrainApiException.__init__(self, message)
 
 class JanrainInvalidUrlError(JanrainApiException):
     """ Invalid URL. """
+    # DEPRECATED (bad application names include an error in the JSON response)
     pass
 
 class ApiResponseError(JanrainApiException):
