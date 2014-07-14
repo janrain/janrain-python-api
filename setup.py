@@ -38,6 +38,7 @@ setup(
     test_suite = "janrain.capture.test",
     use_2to3 = True,
     install_requires = [
-        'requests'
+        'requests',
+        'pyyaml',
     ]
 )
