@@ -1,6 +1,8 @@
 Janrain Python API
 ==================
 
+[![Build Status](https://travis-ci.org/janrain/janrain-python-api.png?branch=master)](https://travis-ci.org/janrain/janrain-python-api)
+
 Python interface to the
 `Janrain Capture <http://janrain.com/products/capture/>`_ API.
 
