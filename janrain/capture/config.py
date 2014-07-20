@@ -19,10 +19,7 @@ def get_settings_at_path(dot_path):
     yaml_dict = read_config_file()
     current = yaml_dict
     for chunk in dot_path.split('.'):
-        current = current.get(chunk, {})
-    if not current:
-        raise JanrainConfigError("Could not find key '{}' in '{}'." \
-                                 .format(dot_path, get_config_file()))
+        current = current[chunk]
     merge_cluster(current)
     return current
 
@@ -33,15 +30,7 @@ def default_client():
     Returns:
         A dictionary containing the default client settings.
     """
-    config = read_config_file()
-    try:
-        client_name = config['defaults']['default_client']
-    except KeyError:
-        message = "Could not find key 'default_client' in '{}'." \
-                  .format(get_config_file())
-        raise JanrainConfigError(message)
-
-    return get_client(client_name)
+    return get_client(read_config_file()['defaults']['default_client'])
 
 def unittest_client():
     """
@@ -50,15 +39,7 @@ def unittest_client():
     Returns:
         A dictionary containing the default client settings.
     """
-    config = read_config_file()
-    try:
-        client_name = config['defaults']['unittest_client']
-    except KeyError:
-        message = "Could not find key 'unittest_client' in '{}'." \
-                  .format(get_config_file())
-        raise JanrainConfigError(message)
-
-    return get_client(client_name)
+    return get_client(read_config_file()['defaults']['unittest_client'])
 
 def client(client_name):
     """ DEPRECATED """
@@ -126,8 +107,7 @@ def merge_cluster(settings):
     """
     if 'cluster' in settings:
         # merge in cluster values
-        cluster = get_cluster(settings['cluster'])
-        settings.update(cluster)
+        settings.update(get_cluster(settings['cluster']))
 
 def read_config_file():
     """
@@ -136,6 +116,45 @@ def read_config_file():
     Returns:
         A Python dictionary representing the YAML.
     """
-    with open(get_config_file()) as stream:
-        config = yaml.load(stream.read())
-    return config
+    file = get_config_file()
+    with open(file) as stream:
+        yaml_dict = yaml.load(stream.read())
+    return ConfigDict(file, yaml_dict)
+
+from collections import MutableMapping
+
+class ConfigDict(MutableMapping):
+    def __init__(self, file, values={ }, root = ''):
+        self.file = file
+        self.root = root
+        self.values = { }
+        for key, value in values.iteritems():
+            try:
+                self.values[key] = ConfigDict(file, value, self.get_key_path(key))
+            except:
+                self.values[key] = value
+
+    def __len__(self):
+        return len(self.values)
+
+    def __iter__(self):
+        return iter(self.values)
+
+    def __getitem__(self, key):
+        try:
+            return self.values[key]
+        except KeyError:
+            print self.values
+            raise JanrainConfigError(key=self.get_key_path(key), file=self.file)
+
+    def __contains__(self, key):
+        return key in self.values
+
+    def __setitem__(self, key, value):
+        self.values[key] = value
+
+    def __delitem__(self, key):
+        del self.values[key]
+
+    def get_key_path(self, key):
+        return self.root + '.' + key if self.root else key

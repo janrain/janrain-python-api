@@ -10,7 +10,13 @@ class JanrainCredentialsError(Exception):
 
 class JanrainConfigError(Exception):
     """ Exception for credential configuration file errors """
-    pass
+    def __init__(self, message=None, **kwargs):
+        try:
+            if message is None:
+                message = "Could not find key '{}' in '{}'." \
+                          .format(kwargs['key'], kwargs['file'])
+        finally:
+            super(JanrainConfigError, self).__init__(message)
 
 class InvalidApiCallError(JanrainApiException):
     """ Request for a non-existing API call. """
