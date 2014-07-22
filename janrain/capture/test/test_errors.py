@@ -2,6 +2,9 @@ import unittest
 from janrain.capture import Api, config
 from janrain.capture.exceptions import *
 from requests import HTTPError
+from os.path import exists
+from os.path import expanduser
+from os import environ
 
 class TestErrors(unittest.TestCase):
     def setUp(self):
@@ -11,6 +14,9 @@ class TestErrors(unittest.TestCase):
             'client_secret': client['client_secret']
         })
 
+    @unittest.skipUnless(
+        exists(expanduser('~/.janrain-capture')) or environ.has_key('JANRAIN_CONFIG'), 
+        "Config file or enviroment variable is required")
     def test_api_response_error(self):
         with self.assertRaises(ApiResponseError):
             self.api.call('/foobar')

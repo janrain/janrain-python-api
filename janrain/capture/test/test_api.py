@@ -3,6 +3,9 @@ import json
 from janrain.capture import Api, config
 from janrain.capture.api import api_encode
 from janrain.capture.exceptions import *
+from os.path import exists
+from os.path import expanduser
+from os import environ
 
 class TestApi(unittest.TestCase):
     """ Test the api module. """
@@ -13,7 +16,10 @@ class TestApi(unittest.TestCase):
             'client_secret': client['client_secret']
         })
         self.client = client
-
+    
+    @unittest.skipUnless(
+        exists(expanduser('~/.janrain-capture')) or environ.has_key('JANRAIN_CONFIG'), 
+        "Config file or enviroment variable is required")
     def test_api_encode(self):
         # Python natives should be encoded into JSON
         self.assertEqual(api_encode(True), "true")
@@ -21,6 +27,9 @@ class TestApi(unittest.TestCase):
         json.loads(api_encode(['foo', 'bar']))
         json.loads(api_encode({'foo': True, 'bar': None}))
 
+    @unittest.skipUnless(
+        exists(expanduser('~/.janrain-capture')) or environ.has_key('JANRAIN_CONFIG'), 
+        "Config file or enviroment variable is required")
     def test_api_object(self):
         # should prepend https:// if protocol is missing
         api = Api("foo.janrain.com")
