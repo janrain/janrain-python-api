@@ -134,4 +134,10 @@ Enclose filters in double outer-quotes and single inner-quotes::
 
 ----
 
+Versioning
+----------
+This software follows Semantic Versioning convention.
+http://semver.org/
+
+
 Copyright © 2014 Janrain, Inc. All Rights Reserved.
