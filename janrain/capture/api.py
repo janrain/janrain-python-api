@@ -73,8 +73,7 @@ def generate_signature(api_call, unsigned_params):
             sha1_str = hmac.new(client_secret, data, sha1).digest()
             hash_str = b64encode(sha1_str)
             headers['Date'] = timestamp
-            signature = "Signature {}:{}".format(client_id, \
-                                                 hash_str)
+            signature = "Signature {}:{}".format(client_id, hash_str)
             headers['Authorization'] = signature
             logger.debug(signature)
 
