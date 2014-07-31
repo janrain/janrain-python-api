@@ -1,6 +1,6 @@
 """ Base class for making API calls to the Janrain API. """
 # pylint: disable=E0611
-from janrain.capture.exceptions import InvalidApiCallError, ApiResponseError
+from janrain.capture.exceptions import ApiResponseError
 from json import dumps as to_json
 from contextlib import closing
 from base64 import b64encode
@@ -140,7 +140,7 @@ class Api(object):
             http://developers.janrain.com/documentation/capture/restful_api/
 
         Raises:
-            InvalidApiCallError, ApiResponseError
+            ApiResponseError
         """
         # Encode values for the API (JSON, bools, nulls)
         params = dict((key, api_encode(value))
