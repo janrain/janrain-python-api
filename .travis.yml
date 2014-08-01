@@ -5,5 +5,7 @@ python:
   - "3.2"
   - "3.3"
   - "3.4"
+# command to install dependencies
+install: travis_retry python setup.py install
 # command to run tests
-script: python setup.py nosetests --with-doctest
+script: nosetests --with-doctest
