@@ -66,15 +66,14 @@ def generate_signature(api_call, unsigned_params):
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
             data = "{}\n{}\n".format(api_call, timestamp)
             if params:
-                kv_str = ["{}={}".format(k, v.decode('utf-8'))
+                kv_str = ["{}={}".format(k, v)
                     for k, v in params.items()]
                 kv_str.sort()
                 data = data + "\n".join(kv_str) + "\n"
-            sha1_str = hmac.new(client_secret, data.encode(), sha1).digest()
+            sha1_str = hmac.new(client_secret, data, sha1).digest()
             hash_str = b64encode(sha1_str)
             headers['Date'] = timestamp
-            signature = "Signature {}:{}".format(client_id.decode("utf-8"), \
-                                                 hash_str.decode("utf-8"))
+            signature = "Signature {}:{}".format(client_id, hash_str)
             headers['Authorization'] = signature
             logger.debug(signature)
 
