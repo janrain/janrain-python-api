@@ -144,7 +144,6 @@ class ConfigDict(MutableMapping):
         try:
             return self.values[key]
         except KeyError:
-            print self.values
             raise JanrainConfigError(key=self.get_key_path(key), file=self.file)
 
     def __contains__(self, key):
