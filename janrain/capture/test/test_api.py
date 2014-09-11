@@ -18,7 +18,7 @@ class TestApi(unittest.TestCase):
         self.client = client
     
     @unittest.skipUnless(
-        exists(expanduser('~/.janrain-capture')) or environ.has_key('JANRAIN_CONFIG'), 
+        exists(expanduser('~/.janrain-capture')) or environ.get('JANRAIN_CONFIG'), 
         "Config file or enviroment variable is required")
     def test_api_encode(self):
         # Python natives should be encoded into JSON
@@ -28,7 +28,7 @@ class TestApi(unittest.TestCase):
         json.loads(api_encode({'foo': True, 'bar': None}))
 
     @unittest.skipUnless(
-        exists(expanduser('~/.janrain-capture')) or environ.has_key('JANRAIN_CONFIG'), 
+        exists(expanduser('~/.janrain-capture')) or environ.get('JANRAIN_CONFIG'), 
         "Config file or enviroment variable is required")
     def test_api_object(self):
         # should prepend https:// if protocol is missing
