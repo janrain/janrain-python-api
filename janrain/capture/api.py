@@ -32,9 +32,11 @@ def api_encode(value):
         The value encoded for the Janrain API.
     """
     if type(value) in (dict, list):
-        return to_json(value)
+        return to_json(value).encode('utf8')
     elif type(value) == bool:
         return str(value).lower()
+    elif isinstance(value, basestring):
+        return value.encode('utf8')
     return value
 
 
@@ -145,9 +147,6 @@ class Api(object):
         params = dict((key, api_encode(value))
             for key, value in kwargs.items() if value is not None)
         params.update(self.defaults)
-
-        for key, value in params.items():
-            params[key] = value.encode('utf-8')
 
         if api_call[0] !=  "/":
             api_call = "/" + api_call
