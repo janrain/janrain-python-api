@@ -128,7 +128,7 @@ class ConfigDict(MutableMapping):
         self.file = file
         self.root = root
         self.values = { }
-        for key, value in values.iteritems():
+        for key, value in values.items():
             try:
                 self.values[key] = ConfigDict(file, value, self.get_key_path(key))
             except:

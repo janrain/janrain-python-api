@@ -15,7 +15,7 @@ class TestErrors(unittest.TestCase):
         })
 
     @unittest.skipUnless(
-        exists(expanduser('~/.janrain-capture')) or environ.has_key('JANRAIN_CONFIG'), 
+        exists(expanduser('~/.janrain-capture')) or environ.get('JANRAIN_CONFIG'), 
         "Config file or enviroment variable is required")
     def test_api_response_error(self):
         with self.assertRaises(ApiResponseError):
