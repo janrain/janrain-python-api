@@ -103,4 +103,28 @@ Enclose filters in double outer-quotes and single inner-quotes::
 
 ----
 
+Testing
+-------
+
+Some tests will not run until you setup `unittest_client` under
+`defaults` in  `~/.janrain-capture`::
+    
+    defaults:
+        unittest_client: client_name
+    clients:
+        client_name:
+            apid_uri: "https://client_name.janraincapture.com"
+            application_id: "6bc0a4eb7703ccdf749b5c1f464c7660"
+            client_id: "2bfe9d72a4aae8f06a31025b7536be80" 
+            client_secret: "9d667c2b7fae7a329f32b6df17926154"
+
+Create a virtual environment (Optional)::
+    
+    virtualenv venv && source venv/bin/activate
+
+Run the test suite::
+    
+    python setup.py nosetests --with-doctest
+
+
 Copyright © 2014 Janrain, Inc. All Rights Reserved.

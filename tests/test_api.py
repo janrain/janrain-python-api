@@ -6,6 +6,9 @@ from janrain.capture.exceptions import *
 
 class TestApi(unittest.TestCase):
     """ Test the api module. """
+    
+    @unittest.skipUnless(config.check_for_unittest_client(), 
+        "unittest client not in Config file")
     def setUp(self):
         client = config.unittest_client()
         self.api = Api(client['apid_uri'], {

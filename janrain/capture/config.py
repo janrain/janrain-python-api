@@ -1,6 +1,7 @@
 """ Utilities for working with the Janrain API configuration file. """
 import yaml
 import os
+import os.path
 from janrain.capture.exceptions import JanrainConfigError
 
 def get_settings_at_path(dot_path):
@@ -59,6 +60,16 @@ def unittest_client():
         raise JanrainConfigError(message)
 
     return get_client(client_name)
+
+def check_for_unittest_client():
+    """
+    Return true if the unittest client can be loaded.
+    """
+    try:
+        _ = unittest_client()
+        return True
+    except:
+        return False
 
 def client(client_name):
     """ DEPRECATED """
@@ -139,3 +150,10 @@ def read_config_file():
     with open(get_config_file()) as stream:
         config = yaml.load(stream.read())
     return config
+
+def check_for_config_file():
+    """
+    Returns True if the config file exists or False if it does not.
+    """
+    return os.path.isfile(get_config_file())
+

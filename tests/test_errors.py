@@ -3,6 +3,9 @@ from janrain.capture import Api, config
 from janrain.capture.exceptions import *
 
 class TestErrors(unittest.TestCase):
+
+    @unittest.skipUnless(config.check_for_unittest_client(), 
+        "unittest client not in Config file")
     def setUp(self):
         client = config.unittest_client()
         self.api = Api(client['apid_uri'], {
@@ -15,7 +18,7 @@ class TestErrors(unittest.TestCase):
             self.api.call('/foobar')
 
     def test_invalid_url_error(self):
-        with self.assertRaises(JanrainInvalidUrlError):
+        with self.assertRaises(ApiResponseError):
             orig_url = self.api.api_url
             self.api.api_url = "https://foobar.janraincapture.com"
             self.api.call("/entity")

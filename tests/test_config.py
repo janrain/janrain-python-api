@@ -1,8 +1,12 @@
 import unittest
 import os
 from janrain.capture import Api, config
+from janrain.capture.exceptions import JanrainConfigError
 
 class TestConfig(unittest.TestCase):
+
+    @unittest.skipUnless(config.check_for_unittest_client(), 
+        "unittest client not in Config file")
     def setUp(self):
         # use the config file in this directory for config tests
         this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -35,9 +39,10 @@ class TestConfig(unittest.TestCase):
     def test_resolving_keys(self):
         # test resolving keys using dot-notation
         client = config.get_settings_at_path("some.arbitrary.path")
+
         self.assertEqual(client['foo'], "bar")
 
-        with self.assertRaises(KeyError):
+        with self.assertRaises(JanrainConfigError):
             config.get_settings_at_path("foo.bar")
 
     def tearDown(self):
