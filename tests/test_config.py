@@ -15,6 +15,7 @@ class TestConfig(unittest.TestCase):
         if 'JANRAIN_CONFIG' in os.environ:
             self.old_env = os.environ['JANRAIN_CONFIG']
         os.environ['JANRAIN_CONFIG'] = config_file
+        debug = True
 
     def test_clusters(self):
         # test referencing clusters

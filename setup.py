@@ -21,6 +21,7 @@ setup(
     packages = find_packages(),
     namespace_packages = ["janrain"],
     scripts=[os.path.join("bin", script) for script in os.listdir("./bin")],
+    zip_safe=True,
     #license = "",
     classifiers = [
         "Development Status :: 5 - Production/Stable",
@@ -37,6 +38,7 @@ setup(
         'pyyaml',
     ],
     tests_require = [
+        'Nose',
     ],
     setup_requires = [
         'Nose',

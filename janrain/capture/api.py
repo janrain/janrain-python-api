@@ -2,20 +2,32 @@
 # pylint: disable=E0611
 from janrain.capture.exceptions import InvalidApiCallError, ApiResponseError, \
                                        JanrainInvalidUrlError
-from urllib import urlencode
-from urllib2 import Request, urlopen, HTTPError, URLError
 from json import loads as json_decode
 from json import dumps as json_encode
 from contextlib import closing
-from base64 import b64encode
+from base64 import b64encode, b64decode
 from hashlib import sha1
 import hmac
 import time
 import logging
 import gzip
-from StringIO import StringIO
+
+try:
+    from urllib import urlencode
+    from urllib2 import Request, urlopen, HTTPError, URLError
+    from StringIO import StringIO
+except ImportError:
+    from urllib.parse import urlencode
+    from urllib.request import Request, urlopen, HTTPError, URLError
+    from io import StringIO
+
 
 #logging.basicConfig()
+def items(dictionary):
+    try:
+        return dictionary.iteritems() # Python 2
+    except AttributeError:
+        return dictionary.items() # Python 3
 
 def api_encode(value):
     """
@@ -76,7 +88,7 @@ class Api(object):
         """
         # Encode values for the API (JSON, bools, nulls)
         params = dict((key, api_encode(value))
-            for key, value in kwargs.iteritems() if value is not None)
+            for key, value in items(kwargs) if value is not None)
         params.update(self.defaults)
 
         if api_call[0] !=  "/":
@@ -94,8 +106,13 @@ class Api(object):
         if 'client_secret' in print_params:
             print_params['client_secret'] = "CLIENT_SECRET_REMOVED"
         self.logger.debug(urlencode(print_params))
-
-        request.add_data(urlencode(params))
+        
+        encoded_params = urlencode(params)
+        try:
+            request.add_data(encoded_params)
+        except:
+            request.data = encoded_params.encode('utf-8')
+         
         if self.compress:
            request.add_header('Accept-encoding', 'gzip')
 
@@ -131,7 +148,7 @@ class Api(object):
         Raises:
             ApiResponseError
         """
-        data = json_decode(response)
+        data = json_decode(response.decode('utf-8'))
 
         if data['stat'] == 'error':
             self.logger.debug("Response:\n" + json_encode(data, indent=4))
@@ -169,12 +186,15 @@ class Api(object):
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
             data = "{}\n{}\n".format(api_call, timestamp)
             if params:
-                kv_str = ["{}={}".format(k, v) for k, v in params.iteritems()]
+                kv_str = ["{}={}".format(k, v.decode('utf-8')) for k, v in items(params)]
                 kv_str.sort()
                 data = data + "\n".join(kv_str) + "\n"
-            sha1_str = hmac.new(client_secret, data, sha1).digest()
+            sha1_str = hmac.new(client_secret, data.encode('utf-8'), sha1).digest()
             hash_str = b64encode(sha1_str)
             request.add_header("Date", timestamp)
             request.add_header("Authorization",
-                               "Signature {}:{}".format(client_id, hash_str))
+                               "Signature {}:{}".format(
+                                   client_id.decode('utf-8'), 
+                                   hash_str.decode('utf-8'),
+                               ))
 

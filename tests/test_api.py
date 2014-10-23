@@ -16,6 +16,7 @@ class TestApi(unittest.TestCase):
             'client_secret': client['client_secret']
         })
         self.client = client
+        debug = True
 
     def test_api_encode(self):
         # Python natives should be encoded into JSON
@@ -36,5 +37,4 @@ class TestApi(unittest.TestCase):
         # oauth/token returns 400 or 401 which should *not* be a URLError
         with self.assertRaises(ApiResponseError):
             self.api.call("/oauth/token")
-
 
