@@ -21,6 +21,7 @@ setup(
     packages = find_packages(),
     namespace_packages = ["janrain"],
     scripts=[os.path.join("bin", script) for script in os.listdir("./bin")],
+    zip_safe=True,
     #license = "",
     classifiers = [
         "Development Status :: 5 - Production/Stable",
@@ -32,5 +33,14 @@ setup(
         "Topic :: Internet :: WWW/HTTP",
         "License :: OSI Approved :: MIT License"
     ],
-    test_suite = "janrain.capture.test"
+    test_suite = "janrain.capture.test",
+    install_requires = [
+        'pyyaml',
+    ],
+    tests_require = [
+        'Nose',
+    ],
+    setup_requires = [
+        'Nose',
+    ],
 )

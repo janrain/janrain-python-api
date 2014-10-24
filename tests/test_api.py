@@ -6,6 +6,9 @@ from janrain.capture.exceptions import *
 
 class TestApi(unittest.TestCase):
     """ Test the api module. """
+    
+    @unittest.skipUnless(config.check_for_unittest_client(), 
+        "unittest client not in Config file")
     def setUp(self):
         client = config.unittest_client()
         self.api = Api(client['apid_uri'], {
@@ -13,6 +16,7 @@ class TestApi(unittest.TestCase):
             'client_secret': client['client_secret']
         })
         self.client = client
+        debug = True
 
     def test_api_encode(self):
         # Python natives should be encoded into JSON
@@ -33,5 +37,4 @@ class TestApi(unittest.TestCase):
         # oauth/token returns 400 or 401 which should *not* be a URLError
         with self.assertRaises(ApiResponseError):
             self.api.call("/oauth/token")
-
 
