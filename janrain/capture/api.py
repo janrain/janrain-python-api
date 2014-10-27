@@ -32,11 +32,15 @@ def api_encode(value):
         The value encoded for the Janrain API.
     """
     if type(value) in (dict, list):
-        return to_json(value).encode('utf8')
-    elif type(value) == bool:
-        return str(value).lower()
-    elif isinstance(value, basestring):
-        return value.encode('utf8')
+        return to_json(value).encode('utf-8')
+    if type(value) == bool:
+        return str(value).lower().encode('utf-8')
+    try: 
+        if isinstance(value, basestring):
+            return value.encode('utf-8')
+    except NameError:
+        if isinstance(value, str):
+            return value.encode('utf-8')
     return value
 
 
@@ -68,14 +72,20 @@ def generate_signature(api_call, unsigned_params):
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
             data = "{}\n{}\n".format(api_call, timestamp)
             if params:
-                kv_str = ["{}={}".format(k, v)
+                kv_str = ["{}={}".format(k, v.decode('utf-8'))
                     for k, v in params.items()]
                 kv_str.sort()
                 data = data + "\n".join(kv_str) + "\n"
-            sha1_str = hmac.new(client_secret, data, sha1).digest()
+            sha1_str = hmac.new(
+                client_secret.encode('utf-8'),
+                data.encode('utf-8'), 
+                sha1
+            ).digest()
             hash_str = b64encode(sha1_str)
             headers['Date'] = timestamp
-            signature = "Signature {}:{}".format(client_id, hash_str)
+            signature = "Signature {}:{}".format(
+                client_id,
+                hash_str.decode('utf-8'))
             headers['Authorization'] = signature
             logger.debug(signature)
 

@@ -22,10 +22,10 @@ class TestApi(unittest.TestCase):
         "Config file or enviroment variable is required")
     def test_api_encode(self):
         # Python natives should be encoded into JSON
-        self.assertEqual(api_encode(True), "true")
-        self.assertEqual(api_encode(False), "false")
-        json.loads(api_encode(['foo', 'bar']))
-        json.loads(api_encode({'foo': True, 'bar': None}))
+        self.assertEqual(api_encode(True), b"true")
+        self.assertEqual(api_encode(False), b"false")
+        json.loads(api_encode(['foo', 'bar']).decode('utf-8'))
+        json.loads(api_encode({'foo': True, 'bar': None}).decode('utf-8'))
 
     @unittest.skipUnless(
         exists(expanduser('~/.janrain-capture')) or environ.get('JANRAIN_CONFIG'), 
