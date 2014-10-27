@@ -10,16 +10,17 @@ class JanrainCredentialsError(Exception):
 
 class JanrainConfigError(Exception):
     """ Exception for credential configuration file errors """
-    pass
-
-class InvalidApiCallError(JanrainApiException):
-    """ Request for a non-existing API call. """
-    def __init__(self, api_call, status):
-        message = "Invalid API call: {} ({})".format(api_call, status)
-        JanrainApiException.__init__(self, message)
+    def __init__(self, message=None, **kwargs):
+        try:
+            if message is None:
+                message = "Could not find key '{}' in '{}'." \
+                          .format(kwargs['key'], kwargs['file'])
+        finally:
+            super(JanrainConfigError, self).__init__(message)
 
 class JanrainInvalidUrlError(JanrainApiException):
     """ Invalid URL. """
+    # DEPRECATED (bad application names include an error in the JSON response)
     pass
 
 class ApiResponseError(JanrainApiException):

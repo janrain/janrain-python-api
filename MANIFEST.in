@@ -1,1 +1,1 @@
-include README.rst MANIFEST.in LICENSE distribute_setup.py
+include README.rst LICENSE MANIFEST.in distribute_setup.py

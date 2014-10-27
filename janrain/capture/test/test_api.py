@@ -3,24 +3,33 @@ import json
 from janrain.capture import Api, config
 from janrain.capture.api import api_encode
 from janrain.capture.exceptions import *
+from os.path import exists
+from os.path import expanduser
+from os import environ
 
 class TestApi(unittest.TestCase):
     """ Test the api module. """
     def setUp(self):
-        client = config.unittest_client()
+        client = config.get_client('janrain-capture-api-unittest')
         self.api = Api(client['apid_uri'], {
             'client_id': client['client_id'],
             'client_secret': client['client_secret']
         })
         self.client = client
-
+    
+    @unittest.skipUnless(
+        exists(expanduser('~/.janrain-capture')) or environ.get('JANRAIN_CONFIG'), 
+        "Config file or enviroment variable is required")
     def test_api_encode(self):
         # Python natives should be encoded into JSON
-        self.assertEqual(api_encode(True), "true")
-        self.assertEqual(api_encode(False), "false")
-        json.loads(api_encode(['foo', 'bar']))
-        json.loads(api_encode({'foo': True, 'bar': None}))
+        self.assertEqual(api_encode(True), b"true")
+        self.assertEqual(api_encode(False), b"false")
+        json.loads(api_encode(['foo', 'bar']).decode('utf-8'))
+        json.loads(api_encode({'foo': True, 'bar': None}).decode('utf-8'))
 
+    @unittest.skipUnless(
+        exists(expanduser('~/.janrain-capture')) or environ.get('JANRAIN_CONFIG'), 
+        "Config file or enviroment variable is required")
     def test_api_object(self):
         # should prepend https:// if protocol is missing
         api = Api("foo.janrain.com")
@@ -30,8 +39,6 @@ class TestApi(unittest.TestCase):
         result = self.api.call("entity.count", type_name="user")
         self.assertTrue("stat" in result)
 
-        # oauth/token returns 400 or 401 which should *not* be a URLError
+        # oauth/token returns 400 or 401 which should *not* be a HTTPError
         with self.assertRaises(ApiResponseError):
             self.api.call("/oauth/token")
-
-
