@@ -8,15 +8,21 @@ from os import environ
 
 class TestErrors(unittest.TestCase):
     def setUp(self):
-        client = config.get_client('janrain-capture-api-unittest')
-        self.api = Api(client['apid_uri'], {
-            'client_id': client['client_id'],
-            'client_secret': client['client_secret']
+        try:
+            client = config.get_client('janrain-capture-api-unittest')
+            apid_uri = client['apid_uri']
+            client_id = client['client_id']
+            client_secret = client['client_secret']
+        except:
+            apid_uri = environ['APID_URI']
+            client_id = environ['CLIENT_ID']
+            client_secret = environ['CLIENT_SECRET']
+
+        self.api = Api(apid_uri, {
+            'client_id': client_id,
+            'client_secret': client_secret, 
         })
 
-    @unittest.skipUnless(
-        exists(expanduser('~/.janrain-capture')) or environ.get('JANRAIN_CONFIG'), 
-        "Config file or enviroment variable is required")
     def test_api_response_error(self):
         with self.assertRaises(ApiResponseError):
             self.api.call('/foobar')

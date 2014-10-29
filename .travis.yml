@@ -1,10 +1,13 @@
 language: python
 python:
-  - "2.7"
-  - "3.2"
-  - "3.3"
-  - "3.4"
-# command to install dependencies
+- '2.7'
+- '3.2'
+- '3.3'
+- '3.4'
 install: travis_retry python setup.py install
-# command to run tests
 script: nosetests --with-doctest
+env:
+  global:
+  - secure: k4B7gRBQrZgWG5LSr0ZooWlQMH89llDRYr6JSt4+FCGOkXC0kyoVhmiRv3iLtnlw7+YX1X/sj03VHeGYOxYijODMmBdJOxCrk3EM4gSgGpD+AoRDtyIp9YyUpAQeXi9+EoFdJhK/W6NaiAFAg0I+Bry4+xH363ExNNJL2V6N2GY=
+  - secure: WJlVaMXRyf4R97W7tBUSjpacUUS7GcwQdrNfTgsj9Oi0k5N1SFob00Br51diqUEwyKyzaNGGE3zb5Em5GHafOHRpLVEM45oZkUuuj1bebEqCUQVGcuJ4LE3btloTN2UjvRQAZe9eoztcgk5pQtOElzGMaI4AmJeMMZYZSg13Y3w=
+  - secure: k4ynitVjkAMq/d5WTdDMhe5evc/k29aVSnCQp7FmQ5yFE74mJEyrDkmI9mVkMRy6zBU49fqhT93hw3yyjFvEwX16rgzKm98ispHToi40+k55V1C5owU0BGbWwKAX5MbFHSdGAhp107UEZp3IoIc0H7LCfzdn+ATW9m9NyTEVX1I=
