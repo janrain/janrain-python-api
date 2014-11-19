@@ -33,11 +33,14 @@ def api_encode(value):
     """
     if type(value) in (dict, list):
         return to_json(value).encode('utf-8')
-    if type(value) == bool:
+    if type(value) is bool:
         return str(value).lower().encode('utf-8')
-    try: 
+    try:
         if isinstance(value, basestring):
-            return value.encode('utf-8')
+            if isinstance(value, unicode):
+                return value.encode('utf-8')
+            else:
+                return value
     except NameError:
         if isinstance(value, str):
             return value.encode('utf-8')
@@ -72,7 +75,7 @@ def generate_signature(api_call, unsigned_params):
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
             data = "{}\n{}\n".format(api_call, timestamp)
             if params:
-                kv_str = ["{}={}".format(k, v.decode('utf-8'))
+                kv_str = [u"{}={}".format(k, v.decode('utf-8'))
                     for k, v in params.items()]
                 kv_str.sort()
                 data = data + "\n".join(kv_str) + "\n"
