@@ -179,3 +179,9 @@ class ConfigDict(MutableMapping):
                 value = repr(value)
             pairs.append("{key}: {value}".format(key=repr(key), value=value))
         return "{{{0}}}".format(", ".join(pairs))
+
+    def __repr__(self):
+        if self.root:
+            return repr(self.values)
+        else:
+            return "ConfigDict{}".format(repr((self.file, self.values)))
