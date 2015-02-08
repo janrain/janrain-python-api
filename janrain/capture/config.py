@@ -77,6 +77,21 @@ def get_cluster(cluster_name):
     """
     return get_settings_at_path("clusters." + cluster_name)
 
+def get_settings(key):
+    """
+    Get the settings defined for the specified client or cluster.
+
+    Args:
+        key - The name of the client or cluster defined in the config file
+
+    Returns:
+        A dictionary containing the specified settings.
+    """
+    try:
+        return get_settings_at_path("clients." + key)
+    except JanrainConfigError:
+        return get_settings_at_path("clusters." + key)
+
 def get_clusters():
     """
     Get the list of all clusters.
