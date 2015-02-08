@@ -88,9 +88,12 @@ def get_settings(key):
         A dictionary containing the specified settings.
     """
     try:
-        return get_settings_at_path("clients." + key)
+        return get_settings_at_path(key)
     except JanrainConfigError:
-        return get_settings_at_path("clusters." + key)
+        try:
+            return get_settings_at_path("clients." + key)
+        except JanrainConfigError:
+            return get_settings_at_path("clusters." + key)
 
 def get_clusters():
     """
