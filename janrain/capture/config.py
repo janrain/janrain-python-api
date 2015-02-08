@@ -56,7 +56,6 @@ def get_client(client_name):
         A dictionary containing the client settings.
     """
     client = get_settings_at_path("clients." + client_name)
-    merge_cluster(client)
 
     return client
 
@@ -98,17 +97,6 @@ def get_config_file():
     except KeyError:
         return os.path.join(os.path.expanduser("~"), ".janrain-capture")
 
-def merge_cluster(settings):
-    """
-    Merge the cluster settings into the dictionary if a 'clusters' key exists.
-
-    Args:
-        settings - The settings to dictionary to merge cluster setings into.
-    """
-    if 'cluster' in settings:
-        # merge in cluster values
-        settings.update(get_cluster(settings['cluster']))
-
 def read_config_file():
     """
     Parse the YAML configuration file into Python types.
@@ -119,7 +107,13 @@ def read_config_file():
     file = get_config_file()
     with open(file) as stream:
         yaml_dict = yaml.load(stream.read())
-    return ConfigDict(file, yaml_dict)
+    config = ConfigDict(file, yaml_dict)
+    # merge clusters into clients
+    if 'clusters' in config and 'clients' in config:
+        for client in config['clients']:
+            for key, value in config['clusters'][client['cluster']]:
+                client.setdefault(key, value)
+    return config
 
 from collections import MutableMapping
 
