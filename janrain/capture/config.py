@@ -30,7 +30,7 @@ def default_client():
     Returns:
         A dictionary containing the default client settings.
     """
-    return get_client(read_config_file()['defaults']['default_client'])
+    return get_settings(read_config_file()['defaults']['default_client'])
 
 def unittest_client():
     """
@@ -39,7 +39,7 @@ def unittest_client():
     Returns:
         A dictionary containing the default client settings.
     """
-    return get_client(read_config_file()['defaults']['unittest_client'])
+    return get_settings(read_config_file()['defaults']['unittest_client'])
 
 def client(client_name):
     """ DEPRECATED """
