@@ -17,10 +17,10 @@ class TestConfig(unittest.TestCase):
         cluster = config.get_cluster("dev")
         self.assertIn('client_id', cluster)
 
-        # get_client() should merge the cluster if it is referenced instead of
-        # an explicit client_id and client_secret
+    def test_merging(self):
+        # test merging clusters into clients
         client = config.get_client("cluster-client")
-        self.assertEqual(client['client_id'], cluster['client_id'])
+        self.assertEqual(client['client_id'], 'dev client_id')
 
     def test_defaults(self):
         # test convenience funcitons for getting defaults
