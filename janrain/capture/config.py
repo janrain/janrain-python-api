@@ -20,7 +20,6 @@ def get_settings_at_path(dot_path):
     current = yaml_dict
     for chunk in dot_path.split('.'):
         current = current[chunk]
-    merge_cluster(current)
     return current
 
 def default_client():
@@ -110,9 +109,10 @@ def read_config_file():
     config = ConfigDict(file, yaml_dict)
     # merge clusters into clients
     if 'clusters' in config and 'clients' in config:
-        for client in config['clients']:
-            for key, value in config['clusters'][client['cluster']]:
-                client.setdefault(key, value)
+        for client in config['clients'].itervalues():
+            if 'cluster' in client:
+                for key, value in config['clusters'][client['cluster']].iteritems():
+                    client.setdefault(key, value)
     return config
 
 from collections import MutableMapping
