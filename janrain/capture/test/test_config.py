@@ -21,6 +21,8 @@ class TestConfig(unittest.TestCase):
         # test merging clusters into clients
         client = config.get_client("cluster-client")
         self.assertEqual(client['client_id'], 'dev client_id')
+        # client settings should not be overwritten
+        self.assertEqual(client['apid_uri'], 'https://cluster.example.com')
 
     def test_defaults(self):
         # test convenience funcitons for getting defaults

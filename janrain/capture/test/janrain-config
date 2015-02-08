@@ -4,16 +4,17 @@ defaults:
 
 clusters:
   dev:
+    apid_uri: https://dev.example.com
     client_id: dev client_id
     client_secret: dev client_secret
 
 clients:
   test-client:
-    apid_uri: https://
+    apid_uri: https://test.example.com
     client_id: test client_id
     client_secret: test client_secret
   cluster-client:
-    apid_uri: https://
+    apid_uri: https://cluster.example.com
     cluster: dev
 
 some:
