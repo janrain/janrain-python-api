@@ -31,6 +31,11 @@ class TestConfig(unittest.TestCase):
             self.assertIn('client_secret', client)
             self.assertIn('apid_uri', client)
 
+    def test_settings(self):
+        # test looking up clusters or clients without specifying which
+        settings = config.get_settings('dev')
+        self.assertEqual(settings['client_id'], "dev client_id")
+
     def test_resolving_keys(self):
         # test resolving keys using dot-notation
         client = config.get_settings_at_path("some.arbitrary.path")

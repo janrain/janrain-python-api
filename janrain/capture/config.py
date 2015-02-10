@@ -30,7 +30,7 @@ def default_client():
     Returns:
         A dictionary containing the default client settings.
     """
-    return get_client(read_config_file()['defaults']['default_client'])
+    return get_settings(read_config_file()['defaults']['default_client'])
 
 def unittest_client():
     """
@@ -39,7 +39,7 @@ def unittest_client():
     Returns:
         A dictionary containing the default client settings.
     """
-    return get_client(read_config_file()['defaults']['unittest_client'])
+    return get_settings(read_config_file()['defaults']['unittest_client'])
 
 def client(client_name):
     """ DEPRECATED """
@@ -76,6 +76,24 @@ def get_cluster(cluster_name):
         A dictionary containing the cluster settings.
     """
     return get_settings_at_path("clusters." + cluster_name)
+
+def get_settings(key):
+    """
+    Get the settings defined for the specified client or cluster.
+
+    Args:
+        key - The name of the client or cluster defined in the config file
+
+    Returns:
+        A dictionary containing the specified settings.
+    """
+    try:
+        return get_settings_at_path(key)
+    except JanrainConfigError:
+        try:
+            return get_settings_at_path("clients." + key)
+        except JanrainConfigError:
+            return get_settings_at_path("clusters." + key)
 
 def get_clusters():
     """
