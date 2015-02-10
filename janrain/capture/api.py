@@ -77,7 +77,7 @@ def generate_signature(api_call, unsigned_params):
                 kv_str.sort()
                 data = data + "\n".join(kv_str) + "\n"
             sha1_str = hmac.new(
-                client_secret.encode('utf-8'),
+                client_secret,
                 data, 
                 sha1
             ).digest()
