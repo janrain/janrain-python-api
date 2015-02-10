@@ -72,13 +72,13 @@ def generate_signature(api_call, unsigned_params):
             timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
             data = "{}\n{}\n".format(api_call, timestamp)
             if params:
-                kv_str = ["{}={}".format(k, v.decode('utf-8'))
+                kv_str = ["{}={}".format(k, v)
                     for k, v in params.items()]
                 kv_str.sort()
                 data = data + "\n".join(kv_str) + "\n"
             sha1_str = hmac.new(
                 client_secret.encode('utf-8'),
-                data.encode('utf-8'), 
+                data, 
                 sha1
             ).digest()
             hash_str = b64encode(sha1_str)
