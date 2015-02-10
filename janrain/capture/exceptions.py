@@ -8,7 +8,7 @@ class JanrainCredentialsError(Exception):
     """ Exception for credential errors (eg. Missing credentials) """
     pass
 
-class JanrainConfigError(KeyError):
+class JanrainConfigError(Exception):
     """ Exception for credential configuration file errors """
     def __init__(self, message=None, **kwargs):
         try:
@@ -16,7 +16,7 @@ class JanrainConfigError(KeyError):
                 message = "Could not find key '{}' in '{}'." \
                           .format(kwargs['key'], kwargs['file'])
         finally:
-            KeyError.__init__(self, message)
+            super(JanrainConfigError, self).__init__(message)
 
 class JanrainInvalidUrlError(JanrainApiException):
     """ Invalid URL. """
