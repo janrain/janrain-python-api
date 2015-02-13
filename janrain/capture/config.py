@@ -169,3 +169,19 @@ class ConfigDict(MutableMapping):
 
     def get_key_path(self, key):
         return self.root + '.' + key if self.root else key
+
+    def __str__(self):
+        pairs = []
+        for key, value in self.values.iteritems():
+            if isinstance(value, ConfigDict):
+                value = str(value)
+            else:
+                value = repr(value)
+            pairs.append("{key}: {value}".format(key=repr(key), value=value))
+        return "{{{0}}}".format(", ".join(pairs))
+
+    def __repr__(self):
+        if self.root:
+            return repr(self.values)
+        else:
+            return "ConfigDict{}".format(repr((self.file, self.values)))
