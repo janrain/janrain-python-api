@@ -91,7 +91,12 @@ def get_settings(key):
         try:
             return get_settings_at_path("clients." + key)
         except JanrainConfigError:
-            return get_settings_at_path("clusters." + key)
+            try:
+                return get_settings_at_path("clusters." + key)
+            except JanrainConfigError:
+                raise JanrainConfigError("Could not find '{0}', 'clients.{0}',"\
+                    " or 'clusters.{0}' in '{1}'".format(key,
+                                                         get_config_file()))
 
 def get_clusters():
     """
