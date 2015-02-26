@@ -88,6 +88,8 @@ def get_settings(key):
     try:
         return get_settings_at_path(key)
     except JanrainConfigError:
+        if '.' in key:
+            raise
         try:
             return get_settings_at_path("clients." + key)
         except JanrainConfigError:
