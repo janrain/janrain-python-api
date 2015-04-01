@@ -1,6 +1,7 @@
 """ Base class for making API calls to the Janrain API. """
 # pylint: disable=E0611
 from janrain.capture.exceptions import ApiResponseError
+from janrain import utf8_encode
 from json import dumps as to_json
 from contextlib import closing
 from base64 import b64encode
@@ -78,7 +79,7 @@ def generate_signature(api_call, unsigned_params):
                 data = data + "\n".join(kv_str) + "\n"
             sha1_str = hmac.new(
                 client_secret.encode('utf-8'),
-                data, 
+                utf8_encode(data),
                 sha1
             ).digest()
             hash_str = b64encode(sha1_str)
