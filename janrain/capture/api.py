@@ -1,7 +1,7 @@
 """ Base class for making API calls to the Janrain API. """
 # pylint: disable=E0611
 from janrain.capture.exceptions import ApiResponseError
-from janrain import utf8_encode
+from janrain.utils import utf8_encode
 from json import dumps as to_json
 from contextlib import closing
 from base64 import b64encode
