@@ -11,7 +11,7 @@ from janrain.capture import Api, config, get_version, ApiResponseError, \
 class ApiArgumentParser(ArgumentParser):
     """
     A subclass of the argparse.ArgumentParser in the standard library. Adds the
-    common command-line options for authenticating with the Janrain API and 
+    common command-line options for authenticating with the Janrain API and
     allows for an janrain.capture.Api instance to be initialized using those
     credentials.
 

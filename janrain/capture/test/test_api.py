@@ -22,9 +22,9 @@ class TestApi(unittest.TestCase):
 
         self.api = Api(apid_uri, {
             'client_id': client_id,
-            'client_secret': client_secret, 
+            'client_secret': client_secret,
         })
-    
+
     def test_api_encode(self):
         # Python natives should be encoded into JSON
         self.assertEqual(api_encode(True), b"true")
