@@ -114,6 +114,13 @@ class ApiArgumentParser(ArgumentParser):
         else:
             return Api(credentials['apid_uri'], defaults)
 
+# parameterGen flattens the parameters list if multiple -p is used
+def parameterGen(params):
+    for s in params:
+        if isinstance(s, list):
+            for item in s:
+                yield item.split("=", 1)
+        else: yield s.split("=", 1)
 
 def main():
     """
@@ -124,7 +131,9 @@ def main():
     parser.add_argument('api_call',
                         help="API endpoint expressed as a relative path " \
                              "(eg. /settings/get).")
-    parser.add_argument('-p', '--parameters', nargs='*',
+    # combining nargs='*' with append action produces a list of lists when
+    # using -p multiple times.
+    parser.add_argument('-p', '--parameters', action='append', nargs='*',
                         metavar="parameter=value",
                         help="parameters passed through to the API call")
     parser.add_argument('-v', '--version', action='version',
@@ -149,8 +158,7 @@ def main():
     # map list of parameters from command line into a dict for use as kwargs
     kwargs = {}
     if args.parameters:
-        kwargs = dict((key, value) for key, value in [s.split("=", 1)
-                      for s in args.parameters])
+        kwargs = dict((key, value) for key, value in parameterGen(args.parameters))
 
     try:
         data = api.call(args.api_call, **kwargs)
