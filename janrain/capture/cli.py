@@ -114,13 +114,13 @@ class ApiArgumentParser(ArgumentParser):
         else:
             return Api(credentials['apid_uri'], defaults)
 
-# parameterGen flattens the parameters list if multiple -p is used
-def parameterGen(params):
-    for s in params:
-        if isinstance(s, list):
-            for item in s:
-                yield item.split("=", 1)
-        else: yield s.split("=", 1)
+# flattens the parameters list if multiple -p is used
+def flatten_list(items):
+    if isinstance (items, list):
+        for i in items:
+            for s in flatten_list(i):
+                yield s
+    else: yield items
 
 def main():
     """
@@ -158,7 +158,7 @@ def main():
     # map list of parameters from command line into a dict for use as kwargs
     kwargs = {}
     if args.parameters:
-        kwargs = dict((key, value) for key, value in parameterGen(args.parameters))
+        kwargs = dict(item.split("=", 1) for item in flatten_list(args.parameters))
 
     try:
         data = api.call(args.api_call, **kwargs)
