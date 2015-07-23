@@ -20,7 +20,7 @@ class TestErrors(unittest.TestCase):
 
         self.api = Api(apid_uri, {
             'client_id': client_id,
-            'client_secret': client_secret, 
+            'client_secret': client_secret,
         })
 
     def test_api_response_error(self):

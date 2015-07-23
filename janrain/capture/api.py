@@ -36,7 +36,7 @@ def api_encode(value):
         return to_json(value).encode('utf-8')
     if type(value) == bool:
         return str(value).lower().encode('utf-8')
-    try: 
+    try:
         if isinstance(value, basestring):
             return value.encode('utf-8')
     except NameError:
@@ -76,7 +76,7 @@ def generate_signature(api_call, unsigned_params):
                 kv_str = ["{}={}".format(k, v)
                     for k, v in params.items()]
                 kv_str.sort()
-                data = data + "\n".join(kv_str) + "\n"
+                data += "\n".join(kv_str) + "\n"
             sha1_str = hmac.new(
                 client_secret.encode('utf-8'),
                 utf8_encode(data),
@@ -155,9 +155,10 @@ class Api(object):
             ApiResponseError
         """
         # Encode values for the API (JSON, bools, nulls)
-        params = dict((key, api_encode(value))
-            for key, value in kwargs.items() if value is not None)
-        params.update(self.defaults)
+        params = self.defaults.copy()
+        for key, value in kwargs.items():
+            if value is not None:
+                params[key] = api_encode(value)
 
         if api_call[0] !=  "/":
             api_call = "/" + api_call
@@ -174,7 +175,7 @@ class Api(object):
         # Print the parameters (for debugging)
         print_params = params.copy()
         if 'client_secret' in print_params:
-            print_params['client_secret'] = "CLIENT_SECRET_REMOVED"
+            print_params['client_secret'] = "REDACTED"
         logger.debug(print_params)
 
         # Accept gzip compression
