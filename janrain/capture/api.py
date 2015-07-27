@@ -32,10 +32,12 @@ def api_encode(value):
     Returns:
         The value encoded for the Janrain API.
     """
-    if type(value) in (dict, list):
+    if isinstance(value, (dict, list, tuple)):
         return to_json(value).encode('utf-8')
-    if type(value) == bool:
-        return str(value).lower().encode('utf-8')
+    if value is True:
+        return 'true'
+    if value is False:
+        return 'false'
     try:
         if isinstance(value, basestring):
             return value.encode('utf-8')
