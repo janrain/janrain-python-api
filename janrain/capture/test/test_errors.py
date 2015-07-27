@@ -24,7 +24,7 @@ class TestErrors(unittest.TestCase):
         })
 
     def test_api_response_error(self):
-        with self.assertRaises(ApiResponseError):
+        with self.assertRaises(HTTPError):
             self.api.call('/foobar')
 
         with self.assertRaises(ApiResponseError):
