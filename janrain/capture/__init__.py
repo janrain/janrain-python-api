@@ -1,7 +1,7 @@
 from janrain.capture.api import Api
 from janrain.capture.exceptions import *
 
-VERSION = (0, 3, 4)
+VERSION = (0, 3, 5)
 
 def get_version():
     return "%s.%s.%s" % (VERSION[0], VERSION[1], VERSION[2])
