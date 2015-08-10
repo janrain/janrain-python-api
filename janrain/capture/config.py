@@ -141,6 +141,7 @@ def read_config_file():
     return config
 
 from collections import MutableMapping
+import copy
 
 class ConfigDict(MutableMapping):
     def __init__(self, file, values={ }, root = ''):
@@ -192,3 +193,6 @@ class ConfigDict(MutableMapping):
             return repr(self.values)
         else:
             return "ConfigDict{}".format(repr((self.file, self.values)))
+
+    def copy(self):
+        return copy.copy(self)
