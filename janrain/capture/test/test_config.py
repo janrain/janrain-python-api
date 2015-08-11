@@ -15,11 +15,13 @@ class TestConfig(unittest.TestCase):
     def test_clusters(self):
         # test referencing clusters
         cluster = config.get_cluster("dev")
+        self.assertTrue(isinstance(cluster, dict))
         self.assertIn('client_id', cluster)
 
     def test_merging(self):
         # test merging clusters into clients
         client = config.get_client("cluster-client")
+        self.assertTrue(isinstance(client, dict))
         self.assertEqual(client['client_id'], 'dev client_id')
         # client settings should not be overwritten
         self.assertEqual(client['apid_uri'], 'https://cluster.example.com')
@@ -29,6 +31,7 @@ class TestConfig(unittest.TestCase):
         clients = []
         clients.append(config.default_client())
         for client in clients:
+            self.assertTrue(isinstance(client, dict))
             self.assertIn('client_id', client)
             self.assertIn('client_secret', client)
             self.assertIn('apid_uri', client)
@@ -36,11 +39,13 @@ class TestConfig(unittest.TestCase):
     def test_settings(self):
         # test looking up clusters or clients without specifying which
         settings = config.get_settings('dev')
+        self.assertTrue(isinstance(settings, dict))
         self.assertEqual(settings['client_id'], "dev client_id")
 
     def test_resolving_keys(self):
         # test resolving keys using dot-notation
         client = config.get_settings_at_path("some.arbitrary.path")
+        self.assertTrue(isinstance(client, dict))
         self.assertEqual(client['foo'], "bar")
 
         with self.assertRaises(JanrainConfigError):
