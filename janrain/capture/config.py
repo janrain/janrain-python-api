@@ -20,7 +20,7 @@ def get_settings_at_path(dot_path):
     current = yaml_dict
     for chunk in dot_path.split('.'):
         current = current[chunk]
-    return current
+    return dict(current)
 
 def default_client():
     """
@@ -192,3 +192,4 @@ class ConfigDict(MutableMapping):
             return repr(self.values)
         else:
             return "ConfigDict{}".format(repr((self.file, self.values)))
+
