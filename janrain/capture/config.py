@@ -146,40 +146,40 @@ class ConfigDict(MutableMapping):
     def __init__(self, file, values={ }, root = ''):
         self.file = file
         self.root = root
-        self.values = { }
+        self.vals = { }
         for key, value in values.items():
             try:
-                self.values[key] = ConfigDict(file, value, self.get_key_path(key))
+                self.vals[key] = ConfigDict(file, value, self.get_key_path(key))
             except:
-                self.values[key] = value
+                self.vals[key] = value
 
     def __len__(self):
-        return len(self.values)
+        return len(self.vals)
 
     def __iter__(self):
-        return iter(self.values)
+        return iter(self.vals)
 
     def __getitem__(self, key):
         try:
-            return self.values[key]
+            return self.vals[key]
         except KeyError:
             raise JanrainConfigError(key=self.get_key_path(key), file=self.file)
 
     def __contains__(self, key):
-        return key in self.values
+        return key in self.vals
 
     def __setitem__(self, key, value):
-        self.values[key] = value
+        self.vals[key] = value
 
     def __delitem__(self, key):
-        del self.values[key]
+        del self.vals[key]
 
     def get_key_path(self, key):
         return self.root + '.' + key if self.root else key
 
     def __str__(self):
         pairs = []
-        for key, value in self.values.iteritems():
+        for key, value in self.vals.iteritems():
             if isinstance(value, ConfigDict):
                 value = str(value)
             else:
@@ -189,7 +189,7 @@ class ConfigDict(MutableMapping):
 
     def __repr__(self):
         if self.root:
-            return repr(self.values)
+            return repr(self.vals)
         else:
-            return "ConfigDict{}".format(repr((self.file, self.values)))
+            return "ConfigDict{}".format(repr((self.file, self.vals)))
 
