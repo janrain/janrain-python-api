@@ -38,7 +38,7 @@ class TestApi(unittest.TestCase):
         self.assertEqual(api.api_url, "https://foo.janrain.com")
 
         # responses should have stat
-        result = self.api.call("entity.count", type_name="user")
+        result = self.api.call("clients/list", has_features=["owner"])
         self.assertTrue("stat" in result)
 
         # oauth/token returns 400 or 401 which should *not* be a HTTPError
