@@ -160,7 +160,7 @@ class Api(object):
         params = self.defaults.copy()
         for key, value in kwargs.items():
             if value is not None:
-                params[key] = api_encode(value)
+                params[key] = value
 
         if api_call[0] !=  "/":
             api_call = "/" + api_call
@@ -183,6 +183,9 @@ class Api(object):
         # Accept gzip compression
         if self.compress:
            headers['Accept-encoding'] = 'gzip'
+
+        # encode params for the api
+        params = {k: api_encode(v) for k, v in params.items()}
 
         # Let any exceptions here get raised to the calling code. This includes
         # things like connection errors and timeouts.
