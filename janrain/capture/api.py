@@ -35,9 +35,9 @@ def api_encode(value):
     if isinstance(value, (dict, list, tuple)):
         return to_json(value).encode('utf-8')
     if value is True:
-        return 'true'
+        return 'true'.encode('utf-8')
     if value is False:
-        return 'false'
+        return 'false'.encode('utf-8')
     try:
         if isinstance(value, basestring):
             return value.encode('utf-8')
