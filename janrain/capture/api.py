@@ -35,9 +35,9 @@ def api_encode(value):
     if isinstance(value, (dict, list, tuple)):
         return to_json(value).encode('utf-8')
     if value is True:
-        return 'true'
+        return 'true'.encode('utf-8')
     if value is False:
-        return 'false'
+        return 'false'.encode('utf-8')
     try:
         if isinstance(value, basestring):
             return value.encode('utf-8')
@@ -45,6 +45,14 @@ def api_encode(value):
         if isinstance(value, str):
             return value.encode('utf-8')
     return value
+
+
+def api_decode(value):
+    """Convert api encoded values from utf-8 back to unicode"""
+    try:
+        return value.decode('utf-8')
+    except AttributeError:
+        return value
 
 
 def generate_signature(api_call, unsigned_params):
@@ -60,6 +68,7 @@ def generate_signature(api_call, unsigned_params):
             the modified parameters which should be sent to the request.
         """
         params = unsigned_params.copy()
+        params = {k: api_decode(v) for k, v in params.items()}
 
         # Do not POST authentication parameters. Use them to create an
         # authentication header instead.
@@ -160,7 +169,8 @@ class Api(object):
         params = self.defaults.copy()
         for key, value in kwargs.items():
             if value is not None:
-                params[key] = api_encode(value)
+                params[key] = value
+        params = {k: api_encode(v) for k, v in params.items()}
 
         if api_call[0] !=  "/":
             api_call = "/" + api_call
