@@ -1,7 +1,7 @@
 """ Base class for making API calls to the Janrain API. """
 # pylint: disable=E0611
+from __future__ import unicode_literals
 from janrain.capture.exceptions import ApiResponseError
-from janrain.utils import utf8_encode
 from json import dumps as to_json
 from contextlib import closing
 from base64 import b64encode
@@ -9,6 +9,7 @@ from hashlib import sha1
 import hmac
 import time
 import logging
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -33,26 +34,38 @@ def api_encode(value):
         The value encoded for the Janrain API.
     """
     if isinstance(value, (dict, list, tuple)):
-        return to_json(value).encode('utf-8')
-    if value is True:
-        return 'true'.encode('utf-8')
-    if value is False:
-        return 'false'.encode('utf-8')
-    try:
-        if isinstance(value, basestring):
-            return value.encode('utf-8')
-    except NameError:
+        value = to_json(value)
+    elif value is True:
+        value = 'true'
+    elif value is False:
+        value = 'false'
+    if sys.version_info[0] < 3:
+        if isinstance(value, unicode):
+            value = value.encode('utf-8')
+    else:
         if isinstance(value, str):
-            return value.encode('utf-8')
+            value = value.encode('utf-8')
     return value
 
 
 def api_decode(value):
-    """Convert api encoded values from utf-8 back to unicode"""
-    try:
-        return value.decode('utf-8')
-    except AttributeError:
-        return value
+    """
+    Convert bytestrings from utf-8 to unicode.
+    Anything else is returned untouched.
+
+    Args:
+        value - The Python value to decode.
+
+    Returns:
+        The value decoded into unicode if it was a bytestring
+    """
+    if sys.version_info[0] < 3:
+        if isinstance(value, str):
+            value = value.decode('utf-8')
+    else:
+        if isinstance(value, bytes):
+            value = value.decode('utf-8')
+    return value
 
 
 def generate_signature(api_call, unsigned_params):
@@ -90,7 +103,7 @@ def generate_signature(api_call, unsigned_params):
                 data += "\n".join(kv_str) + "\n"
             sha1_str = hmac.new(
                 client_secret.encode('utf-8'),
-                utf8_encode(data),
+                data.encode('utf-8'),
                 sha1
             ).digest()
             hash_str = b64encode(sha1_str)
