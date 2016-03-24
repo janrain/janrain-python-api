@@ -3,6 +3,7 @@ import json
 from janrain.capture import Api, config
 from janrain.capture.api import api_encode
 from janrain.capture.exceptions import *
+from janrain.capture import version
 from os.path import exists
 from os.path import expanduser
 from os import environ
@@ -44,3 +45,12 @@ class TestApi(unittest.TestCase):
         # oauth/token returns 400 or 401 which should *not* be a HTTPError
         with self.assertRaises(ApiResponseError):
             self.api.call("/oauth/token")
+
+    def test_user_agent(self):
+        # default user agent string will be used if not defined when object is
+        # instantiated
+        api1 = Api("foo.janrain.com")
+        self.assertIsNotNone(api1.user_agent)
+
+        api2 = Api("foo.janrain.com", user_agent="foobar")
+        self.assertEqual(api2.user_agent, "foobar")
