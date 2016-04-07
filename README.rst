@@ -56,9 +56,9 @@ that call the Janrain API.
 
 .. code-block:: python
 
+    import sys
     from janrain.capture import Api, ApiResponseError
     from requests import HTTPError
-    import sys
 
     defaults = {
         'client_id': "YOUR_CLIENT_ID",
