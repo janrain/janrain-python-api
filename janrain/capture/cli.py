@@ -142,6 +142,8 @@ def main():
                         help="sign HTTP requests")
     parser.add_argument('-b', '--debug', action='store_true',
                         help="log debug messages to stdout")
+    parser.add_argument('-a', '--user-agent',
+                        help="user agent to use for the API call")
     args = parser.parse_args()
 
     try:
@@ -151,6 +153,9 @@ def main():
 
     if args.disable_signed_requests:
         api.sign_requests = False
+
+    if args.user_agent:
+        api.user_agent = args.user_agent
 
     if args.debug:
         logging.basicConfig(level=logging.DEBUG)
