@@ -2,6 +2,7 @@
 # pylint: disable=E0611
 from __future__ import unicode_literals
 from janrain.capture.exceptions import ApiResponseError
+from janrain.capture.version import get_version
 from json import dumps as to_json
 from contextlib import closing
 from base64 import b64encode
@@ -151,14 +152,22 @@ class Api(object):
         api = janrain.capture.Api("https://...", defaults)
         count = api.call("entity.count", type_name="user")
     """
-    def __init__(self, api_url, defaults={}, compress=True, sign_requests=True):
+    def __init__(self, api_url, defaults={}, compress=True, sign_requests=True,
+                 user_agent=None):
+
         if api_url[0:4] == "http":
             self.api_url = api_url
         else:
             self.api_url = "https://" + api_url
+
         self.defaults = defaults
         self.sign_requests = sign_requests
         self.compress = compress
+
+        if not user_agent:
+            self.user_agent = "janrain-python-api {}".format(get_version())
+        else:
+            self.user_agent = user_agent
 
 
     def call(self, api_call, **kwargs):
@@ -196,6 +205,9 @@ class Api(object):
             headers, params = generate_signature(api_call, params)
         else:
             headers = {}
+
+        # Custom user agent string
+        headers['User-Agent'] = self.user_agent
 
         # Print the parameters (for debugging)
         print_params = params.copy()
