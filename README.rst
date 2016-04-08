@@ -56,6 +56,7 @@ that call the Janrain API.
 
 .. code-block:: python
 
+    import sys
     from janrain.capture import Api, ApiResponseError
     from requests import HTTPError
 
@@ -68,7 +69,7 @@ that call the Janrain API.
 
     try:
         result = api.call("entity.find", type_name="user")
-    except janrain.capture.ApiResponseError as error:
+    except ApiResponseError as error:
         # Janrain API returned an error response
         sys.exit(str(error))
     except HTTPError as error:
