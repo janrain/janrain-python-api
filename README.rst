@@ -115,14 +115,14 @@ Examples
 
 Passing the authentication credentials::
 
-    capture-api --api-url=[YOUR_CAPTURE_URL] \
+    capture-api --apid-uri=[YOUR_CAPTURE_URL] \
                 --client-id=[YOUR_CLIENT_ID] \
                 --client-secret=[YOUR_CLIENT_SECRET] \
                 entity.count --parameters type_name=user
 
 Enclose JSON values in single outer-quotes and double inner-quotes::
 
-    capture-api --api-url=[YOUR_CAPTURE_URL] \
+    capture-api --apid-uri=[YOUR_CAPTURE_URL] \
                 --client-id=[YOUR_CLIENT_ID] \
                 --client-secret=[YOUR_CLIENT_SECRET] \
                 entity.find --parameters type_name=user \
@@ -130,7 +130,7 @@ Enclose JSON values in single outer-quotes and double inner-quotes::
 
 Enclose filters in double outer-quotes and single inner-quotes::
 
-    capture-api --api-url=[YOUR_CAPTURE_URL] \
+    capture-api --apid-uri=[YOUR_CAPTURE_URL] \
                 --client-id=[YOUR_CLIENT_ID] \
                 --client-secret=[YOUR_CLIENT_SECRET] \
                 entity.find --parameters type_name=user \
