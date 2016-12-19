@@ -9,6 +9,10 @@ Janrain Python API
 Python interface to the
 `Janrain Capture <http://janrain.com/products/capture/>`_ API.
 
+Requirements
+------------
+
+Supports Python versions 2.7 & 3.3-3.4
 
 Install
 -------
