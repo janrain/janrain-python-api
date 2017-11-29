@@ -43,5 +43,6 @@ setup(
     ],
     setup_requires=[
         'Nose',
+        'mock',
     ],
 )

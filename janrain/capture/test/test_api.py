@@ -1,3 +1,5 @@
+import mock
+import requests
 import unittest
 import json
 from janrain.capture import Api, config
@@ -7,6 +9,7 @@ from janrain.capture import version
 from os.path import exists
 from os.path import expanduser
 from os import environ
+
 
 class TestApi(unittest.TestCase):
     """ Test the api module. """
@@ -54,3 +57,15 @@ class TestApi(unittest.TestCase):
 
         api2 = Api("foo.janrain.com", user_agent="foobar")
         self.assertEqual(api2.user_agent, "foobar")
+
+    def test_request_timeout(self):
+        # The request_timeout should be passed to requests.post
+        response = requests.Response()
+        response.status_code = 200
+        response._content = b'{"stat": "ok"}'
+
+        api = Api("foo.janrain.com", {'client_id': 123, 'client_secret': '456'}, request_timeout=5)
+
+        with mock.patch('janrain.capture.api.requests.post', return_value=response) as mock_post:
+            api.call("clients/list", has_features=["owner"])
+            self.assertEqual(mock_post.call_args[1]['timeout'], 5)

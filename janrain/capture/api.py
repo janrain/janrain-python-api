@@ -146,6 +146,9 @@ class Api(object):
         defaults      - A dictionary of default params to pass to every call.
         compress      - A boolean indicating to use gzip compression.
         sign_requests - A boolean indicating to sign the requests.
+        user_agent    - A string to use for the user agent header.
+        request_timeout - Either an int or a tuple indicating how long to wait
+                          for Janrain to respond to requests.
 
     Example:
         defaults = {'client_id': "...", 'client_secret': "..."}
@@ -153,7 +156,7 @@ class Api(object):
         count = api.call("entity.count", type_name="user")
     """
     def __init__(self, api_url, defaults={}, compress=True, sign_requests=True,
-                 user_agent=None):
+                 user_agent=None, request_timeout=None):
 
         if api_url[0:4] == "http":
             self.api_url = api_url
@@ -163,6 +166,7 @@ class Api(object):
         self.defaults = defaults
         self.sign_requests = sign_requests
         self.compress = compress
+        self.request_timeout = request_timeout
 
         if not user_agent:
             self.user_agent = "janrain-python-api {}".format(get_version())
@@ -221,7 +225,7 @@ class Api(object):
 
         # Let any exceptions here get raised to the calling code. This includes
         # things like connection errors and timeouts.
-        r = requests.post(url, headers=headers, data=params)
+        r = requests.post(url, headers=headers, data=params, timeout=self.request_timeout)
 
         try:
             raise_api_exceptions(r.json())
