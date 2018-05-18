@@ -134,9 +134,17 @@ def read_config_file():
     config = ConfigDict(file, yaml_dict)
     # merge clusters into clients
     if 'clusters' in config and 'clients' in config:
-        for client in config['clients'].itervalues():
+        try:
+            client_list = config['clients'].itervalues()
+        except AttributeError:
+            client_list = config['clients'].values()
+        for client in client_list:
             if 'cluster' in client:
-                for key, value in config['clusters'][client['cluster']].iteritems():
+                try:
+                    cluster_list = config['clusters'][client['cluster']].iteritems()
+                except AttributeError:
+                    cluster_list = config['clusters'][client['cluster']].items()
+                for key, value in cluster_list:
                     client.setdefault(key, value)
     return config
 
@@ -179,7 +187,11 @@ class ConfigDict(MutableMapping):
 
     def __str__(self):
         pairs = []
-        for key, value in self.vals.iteritems():
+        try:
+            val_list = self.vals.iteritems()
+        except AttributeError:
+            val_list = self.vals.items()
+        for key, value in val_list:
             if isinstance(value, ConfigDict):
                 value = str(value)
             else:
@@ -192,4 +204,3 @@ class ConfigDict(MutableMapping):
             return repr(self.vals)
         else:
             return "ConfigDict{}".format(repr((self.file, self.vals)))
-
