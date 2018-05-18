@@ -5,6 +5,13 @@ python:
 - '3.4'
 install: travis_retry python setup.py install
 script: nosetests --with-doctest
+before_deploy:
+  - pip install s3pypi
+deploy:
+  provider: script
+  script: bin/deploy
+  on:
+    branch: topic/DEVOPS-2398/deploy-t-pypi-in-s3
 env:
   global:
   - secure: k4B7gRBQrZgWG5LSr0ZooWlQMH89llDRYr6JSt4+FCGOkXC0kyoVhmiRv3iLtnlw7+YX1X/sj03VHeGYOxYijODMmBdJOxCrk3EM4gSgGpD+AoRDtyIp9YyUpAQeXi9+EoFdJhK/W6NaiAFAg0I+Bry4+xH363ExNNJL2V6N2GY=
