@@ -3,4 +3,4 @@
 set -e
 
 echo "Deploying to S3 bucket"
-s3pypi --bucket "${AWS_PYPI_BUCKET}" --private --force
+s3pypi --bucket "${AWS_PYPI_BUCKET}" --private --force --no-wheel
