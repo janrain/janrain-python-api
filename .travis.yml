@@ -11,7 +11,7 @@ deploy:
   provider: script
   script: bin/deploy
   on:
-    branch: topic/devops-2398/disable-wheel-deploy
+    branch: topic/DEVOPS-2398/disable-wheel-deploy
     python: '2.7'
 env:
   global:
