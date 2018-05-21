@@ -11,7 +11,7 @@ deploy:
   provider: script
   script: bin/deploy
   on:
-    branch: master
+    branch: topic/devops-2398/disable-wheel-deploy
 env:
   global:
   - secure: k4B7gRBQrZgWG5LSr0ZooWlQMH89llDRYr6JSt4+FCGOkXC0kyoVhmiRv3iLtnlw7+YX1X/sj03VHeGYOxYijODMmBdJOxCrk3EM4gSgGpD+AoRDtyIp9YyUpAQeXi9+EoFdJhK/W6NaiAFAg0I+Bry4+xH363ExNNJL2V6N2GY=
