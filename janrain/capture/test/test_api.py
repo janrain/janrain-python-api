@@ -3,9 +3,6 @@ import json
 from janrain.capture import Api, config
 from janrain.capture.api import api_encode
 from janrain.capture.exceptions import *
-from janrain.capture import version
-from os.path import exists
-from os.path import expanduser
 from os import environ
 
 class TestApi(unittest.TestCase):
@@ -54,3 +51,15 @@ class TestApi(unittest.TestCase):
 
         api2 = Api("foo.janrain.com", user_agent="foobar")
         self.assertEqual(api2.user_agent, "foobar")
+
+    def test_timeout_not_set(self):
+        api = Api("foo.janrain.com")
+        self.assertIsNone(api.timeout)
+
+    def test_timeout_same(self):
+        api = Api("foo.janrain.com", timeout=10)
+        self.assertEquals(api.timeout, 10)
+
+    def test_timeout_different(self):
+        api = Api("foo.janrain.com", timeout=(10, 15))
+        self.assertEquals(api.timeout, (10, 15))
