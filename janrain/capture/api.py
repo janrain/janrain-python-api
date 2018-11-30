@@ -142,10 +142,12 @@ class Api(object):
     Base object for making API calls to the Janrain API.
 
     Args:
-        api_url       - Absolute URL to API.
-        defaults      - A dictionary of default params to pass to every call.
-        compress      - A boolean indicating to use gzip compression.
-        sign_requests - A boolean indicating to sign the requests.
+        api_url         - Absolute URL to API.
+        defaults        - A dictionary of default params to pass to every call.
+        compress        - A boolean indicating to use gzip compression.
+        sign_requests   - A boolean indicating to sign the requests.
+        user_agent      - A string specifying the HTTP user agent.
+        connect_timeout - Seconds to wait for HTTP connection to be established.
 
     Example:
         defaults = {'client_id': "...", 'client_secret': "..."}
@@ -153,7 +155,7 @@ class Api(object):
         count = api.call("entity.count", type_name="user")
     """
     def __init__(self, api_url, defaults={}, compress=True, sign_requests=True,
-                 user_agent=None):
+                 user_agent=None, connect_timeout=10):
 
         if api_url[0:4] == "http":
             self.api_url = api_url
@@ -168,6 +170,11 @@ class Api(object):
             self.user_agent = "janrain-python-api {}".format(get_version())
         else:
             self.user_agent = user_agent
+
+        # read timeout will match 'timeout' parameter passed to API call
+        self.connect_timeout = connect_timeout
+
+        self.session = requests.Session()
 
 
     def call(self, api_call, **kwargs):
@@ -221,7 +228,12 @@ class Api(object):
 
         # Let any exceptions here get raised to the calling code. This includes
         # things like connection errors and timeouts.
-        r = requests.post(url, headers=headers, data=params)
+        if 'timeout' in params:
+            read_timeout = params['timeout']
+        else:
+            read_timeout = 10
+        r = self.session.post(url, headers=headers, data=params,
+                              timeout=(self.connect_timeout, read_timeout))
 
         try:
             raise_api_exceptions(r.json())
