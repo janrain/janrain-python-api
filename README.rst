@@ -12,7 +12,7 @@ Python interface to the
 Requirements
 ------------
 
-Supports Python versions 2.7 & 3.3-3.4
+Supports Python versions 2.7, 3.3, 3.4, 3.5, 3.6
 
 Install
 -------
@@ -148,4 +148,4 @@ This software follows Semantic Versioning convention.
 http://semver.org/
 
 
-Copyright © 2014 Janrain, Inc. All Rights Reserved.
+Copyright © 2018 Janrain, Inc. All Rights Reserved.
