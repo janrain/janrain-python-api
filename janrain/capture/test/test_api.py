@@ -51,6 +51,10 @@ class TestApi(unittest.TestCase):
         api = Api("foo.janrain.com")
         self.assertEqual(api.api_url, "https://foo.janrain.com")
 
+        # should remove trailing slashes from URL
+        api2 = Api("https://foo.janrain.com/")
+        self.assertEqual(api2.api_url, "https://foo.janrain.com")
+
 
     def test_user_agent(self):
         """ Custom User Agent header can be specified """
