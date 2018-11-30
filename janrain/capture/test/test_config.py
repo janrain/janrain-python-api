@@ -13,13 +13,13 @@ class TestConfig(unittest.TestCase):
         os.environ['JANRAIN_CONFIG'] = config_file
 
     def test_clusters(self):
-        # test referencing clusters
+        """ Configuration can be referenced by cluster key """
         cluster = config.get_cluster("dev")
         self.assertTrue(isinstance(cluster, dict))
         self.assertIn('client_id', cluster)
 
     def test_merging(self):
-        # test merging clusters into clients
+        """ Cluster configuration gets merged into client configuration """
         client = config.get_client("cluster-client")
         self.assertTrue(isinstance(client, dict))
         self.assertEqual(client['client_id'], 'dev client_id')
@@ -27,7 +27,7 @@ class TestConfig(unittest.TestCase):
         self.assertEqual(client['apid_uri'], 'https://cluster.example.com')
 
     def test_defaults(self):
-        # test convenience funcitons for getting defaults
+        """ Configuration files may have a default configuration """
         clients = []
         clients.append(config.default_client())
         for client in clients:
@@ -37,13 +37,22 @@ class TestConfig(unittest.TestCase):
             self.assertIn('apid_uri', client)
 
     def test_settings(self):
-        # test looking up clusters or clients without specifying which
+        """ Configuration can be referenced by cluster or by client """
         settings = config.get_settings('dev')
         self.assertTrue(isinstance(settings, dict))
         self.assertEqual(settings['client_id'], "dev client_id")
+        with self.assertRaises(JanrainConfigError):
+            config.get_settings_at_path("foobar")
+
+        # test looking up clusters or clients with dot-notation
+        settings = config.get_settings('clusters.dev')
+        self.assertTrue(isinstance(settings, dict))
+        self.assertEqual(settings['client_id'], "dev client_id")
+        with self.assertRaises(JanrainConfigError):
+            config.get_settings_at_path("foo.bar")
 
     def test_resolving_keys(self):
-        # test resolving keys using dot-notation
+        """ Configuration can be referenced with dot-notation """
         client = config.get_settings_at_path("some.arbitrary.path")
         self.assertTrue(isinstance(client, dict))
         self.assertEqual(client['foo'], "bar")

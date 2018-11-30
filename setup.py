@@ -42,6 +42,7 @@ setup(
         'pyyaml',
     ],
     setup_requires=[
-        'Nose',
+        'nose',
+        'mock',
     ],
 )

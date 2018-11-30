@@ -128,7 +128,7 @@ def raise_api_exceptions(response):
     Raises:
         ApiResponseError
     """
-    if response['stat'] == 'error':
+    if 'stat' in response and response['stat'] == 'error':
         logger.debug("Response:\n" + to_json(response, indent=4))
         try:
             message = response['error_description']
@@ -236,6 +236,7 @@ class Api(object):
         r = self.session.post(url, headers=headers, data=params,
                               timeout=(self.connect_timeout, read_timeout))
 
+        # json.decoder.JSONDecodeError
         try:
             raise_api_exceptions(r.json())
             if r.status_code not in (200, 400, 401):
