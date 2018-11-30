@@ -157,6 +157,7 @@ class Api(object):
     def __init__(self, api_url, defaults={}, compress=True, sign_requests=True,
                  user_agent=None, connect_timeout=10):
 
+        api_url = api_url.rstrip("/")
         if api_url[0:4] == "http":
             self.api_url = api_url
         else:

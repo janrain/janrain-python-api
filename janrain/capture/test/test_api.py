@@ -35,8 +35,12 @@ class TestApi(unittest.TestCase):
 
     def test_api_object(self):
         # should prepend https:// if protocol is missing
-        api = Api("foo.janrain.com")
-        self.assertEqual(api.api_url, "https://foo.janrain.com")
+        api1 = Api("foo.janrain.com")
+        self.assertEqual(api1.api_url, "https://foo.janrain.com")
+
+        # should remove trailing slashes from URL
+        api2 = Api("https://foo.janrain.com/")
+        self.assertEqual(api2.api_url, "https://foo.janrain.com")
 
         # responses should have stat
         result = self.api.call("clients/list", has_features=["owner"])
