@@ -2,9 +2,8 @@
 # pylint: disable=E0611
 from __future__ import unicode_literals
 from janrain.capture.exceptions import ApiResponseError
-from janrain.capture.version import get_version
+from janrain.capture.version import __version__
 from json import dumps as to_json
-from contextlib import closing
 from base64 import b64encode
 from hashlib import sha1
 import hmac
@@ -19,8 +18,7 @@ logger = logging.getLogger(__name__)
 try:
     import requests
 except ImportError:
-    logger.warn("Missing 'requests' module. Install using 'pip install " \
-                "requests'.")
+    logger.warn("Missing 'requests' module. Install using 'pip install requests'.")
 
 
 def api_encode(value):
@@ -70,52 +68,45 @@ def api_decode(value):
 
 
 def generate_signature(api_call, unsigned_params):
-        """
-        Sign the API call by generating an "Authentication" header.
+    """
+    Sign the API call by generating an "Authentication" header.
 
-        Args:
-            api_call        - The API endpoint as a relative URL.
-            unsigned_params - A dictionary of parameters in the POST to the API.
+    Args:
+        api_call        - The API endpoint as a relative URL.
+        unsigned_params - A dictionary of parameters in the POST to the API.
 
-        Returns:
-            A 2-tuple containing the HTTP headers needed to sign the request and
-            the modified parameters which should be sent to the request.
-        """
-        params = unsigned_params.copy()
-        params = {k: api_decode(v) for k, v in params.items()}
+    Returns:
+        A 2-tuple containing the HTTP headers needed to sign the request and
+        the modified parameters which should be sent to the request.
+    """
+    params = unsigned_params.copy()
+    params = {k: api_decode(v) for k, v in params.items()}
 
-        # Do not POST authentication parameters. Use them to create an
-        # authentication header instead.
-        access_token = params.pop('access_token', None)
-        client_id = params.pop('client_id', None)
-        client_secret = params.pop('client_secret', None)
+    # Do not POST authentication parameters. Use them to create an
+    # authentication header instead.
+    access_token = params.pop('access_token', None)
+    client_id = params.pop('client_id', None)
+    client_secret = params.pop('client_secret', None)
 
-        headers = {}
-        if access_token:
-            # Simply use the access token if provided rather than id/secret
-            headers['Authorization'] = "OAuth {}".format(access_token)
-        else:
-            timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
-            data = "{}\n{}\n".format(api_call, timestamp)
-            if params:
-                kv_str = ["{}={}".format(k, v)
-                    for k, v in params.items()]
-                kv_str.sort()
-                data += "\n".join(kv_str) + "\n"
-            sha1_str = hmac.new(
-                client_secret.encode('utf-8'),
-                data.encode('utf-8'),
-                sha1
-            ).digest()
-            hash_str = b64encode(sha1_str)
-            headers['Date'] = timestamp
-            signature = "Signature {}:{}".format(
-                client_id,
-                hash_str.decode('utf-8'))
-            headers['Authorization'] = signature
-            logger.debug(signature)
+    headers = {}
+    if access_token:
+        # Simply use the access token if provided rather than id/secret
+        headers['Authorization'] = "OAuth {}".format(access_token)
+    else:
+        timestamp = time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime())
+        data = "{}\n{}\n".format(api_call, timestamp)
+        if params:
+            kv_str = ["{}={}".format(k, v) for k, v in params.items()]
+            kv_str.sort()
+            data += "\n".join(kv_str) + "\n"
+        sha1_str = hmac.new(client_secret.encode('utf-8'), data.encode('utf-8'), sha1).digest()
+        hash_str = b64encode(sha1_str)
+        headers['Date'] = timestamp
+        signature = "Signature {}:{}".format(client_id, hash_str.decode('utf-8'))
+        headers['Authorization'] = signature
+        logger.debug(signature)
 
-        return headers, params
+    return headers, params
 
 
 def raise_api_exceptions(response):
@@ -134,8 +125,8 @@ def raise_api_exceptions(response):
             message = response['error_description']
         except KeyError:
             message = response['message']
-        raise ApiResponseError(response['code'], response['error'], \
-                               message, response)
+        raise ApiResponseError(response['code'], response['error'], message, response)
+
 
 class Api(object):
     """
@@ -146,14 +137,17 @@ class Api(object):
         defaults      - A dictionary of default params to pass to every call.
         compress      - A boolean indicating to use gzip compression.
         sign_requests - A boolean indicating to sign the requests.
+        user_agent    - A string to use as a User-Agent request header.
+        timeout       - How many seconds to wait for the server to send data before giving up,
+                        as a float/int or a tuple (connect timeout, read timeout).
 
     Example:
         defaults = {'client_id': "...", 'client_secret': "..."}
         api = janrain.capture.Api("https://...", defaults)
         count = api.call("entity.count", type_name="user")
     """
-    def __init__(self, api_url, defaults={}, compress=True, sign_requests=True,
-                 user_agent=None):
+
+    def __init__(self, api_url, defaults={}, compress=True, sign_requests=True, user_agent=None, timeout=None):
 
         if api_url[0:4] == "http":
             self.api_url = api_url
@@ -165,10 +159,11 @@ class Api(object):
         self.compress = compress
 
         if not user_agent:
-            self.user_agent = "janrain-python-api {}".format(get_version())
+            self.user_agent = "janrain-python-api {}".format(__version__)
         else:
             self.user_agent = user_agent
 
+        self.timeout = timeout
 
     def call(self, api_call, **kwargs):
         """
@@ -192,9 +187,10 @@ class Api(object):
         for key, value in kwargs.items():
             if value is not None:
                 params[key] = value
+
         params = {k: api_encode(v) for k, v in params.items()}
 
-        if api_call[0] !=  "/":
+        if api_call[0] != "/":
             api_call = "/" + api_call
         url = self.api_url + api_call
         logger.debug(url)
@@ -217,11 +213,11 @@ class Api(object):
 
         # Accept gzip compression
         if self.compress:
-           headers['Accept-encoding'] = 'gzip'
+            headers['Accept-encoding'] = 'gzip'
 
         # Let any exceptions here get raised to the calling code. This includes
         # things like connection errors and timeouts.
-        r = requests.post(url, headers=headers, data=params)
+        r = requests.post(url, headers=headers, data=params, timeout=self.timeout)
 
         try:
             raise_api_exceptions(r.json())
