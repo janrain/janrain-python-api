@@ -3,6 +3,7 @@ import yaml
 import os
 from janrain.capture.exceptions import JanrainConfigError
 
+
 def get_settings_at_path(dot_path):
     """
     Get the settings for the specified YAML path.
@@ -22,6 +23,7 @@ def get_settings_at_path(dot_path):
         current = current[chunk]
     return dict(current)
 
+
 def default_client():
     """
     Get the settings for the default client defined in the config file.
@@ -30,6 +32,7 @@ def default_client():
         A dictionary containing the default client settings.
     """
     return get_settings(read_config_file()['defaults']['default_client'])
+
 
 def unittest_client():
     """
@@ -40,9 +43,11 @@ def unittest_client():
     """
     return get_settings(read_config_file()['defaults']['unittest_client'])
 
+
 def client(client_name):
     """ DEPRECATED """
     return get_client(client_name)
+
 
 def get_client(client_name):
     """
@@ -58,9 +63,11 @@ def get_client(client_name):
 
     return client
 
+
 def cluster(cluster_name):
     """ DEPRECATED """
     return get_cluster(cluster_name)
+
 
 def get_cluster(cluster_name):
     """
@@ -74,6 +81,7 @@ def get_cluster(cluster_name):
         A dictionary containing the cluster settings.
     """
     return get_settings_at_path("clusters." + cluster_name)
+
 
 def get_settings(key):
     """
@@ -96,9 +104,10 @@ def get_settings(key):
             try:
                 return get_settings_at_path("clusters." + key)
             except JanrainConfigError:
-                raise JanrainConfigError("Could not find '{0}', 'clients.{0}',"\
-                    " or 'clusters.{0}' in '{1}'".format(key,
-                                                         get_config_file()))
+                raise JanrainConfigError("Could not find '{0}', 'clients.{0}',"
+                                         " or 'clusters.{0}' in '{1}'".format(key,
+                                                                              get_config_file()))
+
 
 def get_clusters():
     """
@@ -108,6 +117,7 @@ def get_clusters():
         A dictionary containing the cluster settings.
     """
     return get_settings_at_path("clusters")
+
 
 def get_config_file():
     """
@@ -120,6 +130,7 @@ def get_config_file():
         return os.environ['JANRAIN_CONFIG']
     except KeyError:
         return os.path.join(os.path.expanduser("~"), ".janrain-capture")
+
 
 def read_config_file():
     """
@@ -141,23 +152,28 @@ def read_config_file():
         for client in client_list:
             if 'cluster' in client:
                 try:
-                    cluster_list = config['clusters'][client['cluster']].iteritems()
+                    cluster_list = config['clusters'][client['cluster']].iteritems(
+                    )
                 except AttributeError:
-                    cluster_list = config['clusters'][client['cluster']].items()
+                    cluster_list = config['clusters'][client['cluster']].items(
+                    )
                 for key, value in cluster_list:
                     client.setdefault(key, value)
     return config
 
+
 from collections import MutableMapping
 
+
 class ConfigDict(MutableMapping):
-    def __init__(self, file, values={ }, root = ''):
+    def __init__(self, file, values={}, root=''):
         self.file = file
         self.root = root
-        self.vals = { }
+        self.vals = {}
         for key, value in values.items():
             try:
-                self.vals[key] = ConfigDict(file, value, self.get_key_path(key))
+                self.vals[key] = ConfigDict(
+                    file, value, self.get_key_path(key))
             except:
                 self.vals[key] = value
 
@@ -171,7 +187,8 @@ class ConfigDict(MutableMapping):
         try:
             return self.vals[key]
         except KeyError:
-            raise JanrainConfigError(key=self.get_key_path(key), file=self.file)
+            raise JanrainConfigError(
+                key=self.get_key_path(key), file=self.file)
 
     def __contains__(self, key):
         return key in self.vals

@@ -4,9 +4,10 @@ import sys
 import os
 import json
 import logging
-from argparse import ArgumentParser, ArgumentError, HelpFormatter
+from argparse import ArgumentParser, HelpFormatter
 from janrain.capture import Api, config, get_version, ApiResponseError, \
-                            JanrainCredentialsError, JanrainConfigError
+    JanrainCredentialsError, JanrainConfigError
+
 
 class ApiArgumentParser(ArgumentParser):
     """
@@ -22,6 +23,7 @@ class ApiArgumentParser(ArgumentParser):
         api = parser.init_api()
 
     """
+
     def __init__(self, *args, **kwargs):
         super(ApiArgumentParser, self).__init__(*args, **kwargs)
         self._parsed_args = None
@@ -36,13 +38,13 @@ class ApiArgumentParser(ArgumentParser):
 
         # credentials defined in config file at the specified path
         self.add_argument('-k', '--config-key',
-                          help="authenticate using the credentials defined at "\
-                               "a specific path in the configuration file "    \
+                          help="authenticate using the credentials defined at "
+                               "a specific path in the configuration file "
                                "(eg. clients.demo)")
 
         # default client found in the configuration file
         self.add_argument('-d', '--default-client', action='store_true',
-                          help="authenticate using the default client defined "\
+                          help="authenticate using the default client defined "
                                "in the configuration file")
 
     def parse_args(self, args=None, namespace=None):
@@ -68,7 +70,7 @@ class ApiArgumentParser(ArgumentParser):
 
         """
         if not self._parsed_args:
-            raise Exception("You must call the parse_args() method before " \
+            raise Exception("You must call the parse_args() method before "
                             "the init_api() method.")
 
         args = self._parsed_args
@@ -86,7 +88,7 @@ class ApiArgumentParser(ArgumentParser):
             credentials = config.default_client()
 
         elif 'CAPTURE_CLIENT_ID' in os.environ \
-            and 'CAPTURE_CLIENT_SECRET' in os.environ:
+                and 'CAPTURE_CLIENT_SECRET' in os.environ:
             credentials = {
                 'client_id': os.environ['CAPTURE_CLIENT_ID'],
                 'client_secret': os.environ['CAPTURE_CLIENT_SECRET']
@@ -115,21 +117,26 @@ class ApiArgumentParser(ArgumentParser):
             return Api(credentials['apid_uri'], defaults)
 
 # flattens the parameters list if multiple -p is used
+
+
 def flatten_list(items):
-    if isinstance (items, list):
+    if isinstance(items, list):
         for i in items:
             for s in flatten_list(i):
                 yield s
-    else: yield items
+    else:
+        yield items
+
 
 def main():
     """
     Main entry point for CLI. This may be called by running the module directly
     or by an executable installed onto the system path.
     """
-    parser = ApiArgumentParser(formatter_class=lambda prog: HelpFormatter(prog,max_help_position=30))
+    parser = ApiArgumentParser(
+        formatter_class=lambda prog: HelpFormatter(prog, max_help_position=30))
     parser.add_argument('api_call',
-                        help="API endpoint expressed as a relative path " \
+                        help="API endpoint expressed as a relative path "
                              "(eg. /settings/get).")
     # combining nargs='*' with append action produces a list of lists when
     # using -p multiple times.
@@ -163,7 +170,8 @@ def main():
     # map list of parameters from command line into a dict for use as kwargs
     kwargs = {}
     if args.parameters:
-        kwargs = dict(item.split("=", 1) for item in flatten_list(args.parameters))
+        kwargs = dict(item.split("=", 1)
+                      for item in flatten_list(args.parameters))
 
     try:
         data = api.call(args.api_call, **kwargs)
@@ -173,6 +181,7 @@ def main():
     print(json.dumps(data, indent=2, sort_keys=True))
 
     sys.exit()
+
 
 if __name__ == "__main__":
     main()

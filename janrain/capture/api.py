@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 try:
     import requests
 except ImportError:
-    logger.warn("Missing 'requests' module. Install using 'pip install requests'.")
+    logger.warn(
+        "Missing 'requests' module. Install using 'pip install requests'.")
 
 
 def api_encode(value):
@@ -99,10 +100,12 @@ def generate_signature(api_call, unsigned_params):
             kv_str = ["{}={}".format(k, v) for k, v in params.items()]
             kv_str.sort()
             data += "\n".join(kv_str) + "\n"
-        sha1_str = hmac.new(client_secret.encode('utf-8'), data.encode('utf-8'), sha1).digest()
+        sha1_str = hmac.new(client_secret.encode('utf-8'),
+                            data.encode('utf-8'), sha1).digest()
         hash_str = b64encode(sha1_str)
         headers['Date'] = timestamp
-        signature = "Signature {}:{}".format(client_id, hash_str.decode('utf-8'))
+        signature = "Signature {}:{}".format(
+            client_id, hash_str.decode('utf-8'))
         headers['Authorization'] = signature
         logger.debug(signature)
 
@@ -125,7 +128,8 @@ def raise_api_exceptions(response):
             message = response['error_description']
         except KeyError:
             message = response['message']
-        raise ApiResponseError(response['code'], response['error'], message, response)
+        raise ApiResponseError(
+            response['code'], response['error'], message, response)
 
 
 class Api(object):
@@ -148,7 +152,6 @@ class Api(object):
 
     def __init__(self, api_url, defaults={}, compress=True, sign_requests=True,
                  user_agent=None, connect_timeout=10):
-
 
         api_url = api_url.rstrip("/")
         if api_url[0:4] == "http":
@@ -229,8 +232,6 @@ class Api(object):
             read_timeout = 10
         r = self.session.post(url, headers=headers, data=params,
                               timeout=(self.connect_timeout, read_timeout))
-
-        r = requests.post(url, headers=headers, data=params, timeout=self.timeout)
 
         # json.decoder.JSONDecodeError
         try:

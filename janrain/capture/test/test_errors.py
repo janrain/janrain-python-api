@@ -7,12 +7,13 @@ try:
 except ImportError:
     from unittest.mock import patch
 
-from janrain.capture import Api, config
+from janrain.capture import Api
 from janrain.capture.exceptions import *
 
 
 class TestErrors(unittest.TestCase):
     """ Test error handling """
+
     def test_api_response_errors(self):
         """
         API errors with valid JSON responses raise ApiResponseError
@@ -35,7 +36,6 @@ class TestErrors(unittest.TestCase):
             self.assertEqual(cm.exception.code, 999)
             self.assertEqual(cm.exception.error, "mock_error")
 
-
     def test_http_response_errors(self):
         """
         HTTP Errors without valid JSON responses raise HTTPError
@@ -47,10 +47,10 @@ class TestErrors(unittest.TestCase):
         with patch.object(Session, 'post') as mock_post:
             mock_post.return_value.status_code.return_value = 404
             mock_post.return_value.json.return_value = '404 Not Found'
-            mock_post.return_value.raise_for_status.side_effect = HTTPError('Mock HTTP Error')
+            mock_post.return_value.raise_for_status.side_effect = HTTPError(
+                'Mock HTTP Error')
             with self.assertRaises(HTTPError):
                 api.call('/foo')
-
 
     def test_oauth_4xx_status(self):
         """ HTTP 400 and 401 responses should not be handled as errors """

@@ -1,6 +1,7 @@
 import unittest
 import os
-from janrain.capture import Api, config, JanrainConfigError
+from janrain.capture import config, JanrainConfigError
+
 
 class TestConfig(unittest.TestCase):
     def setUp(self):
