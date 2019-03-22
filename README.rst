@@ -12,7 +12,7 @@ Python interface to the
 Requirements
 ------------
 
-Supports Python versions 2.7, 3.3, 3.4, 3.5, 3.6
+Supports Python versions 2.7, 3.3, 3.4, 3.5, 3.6, 3.7
 
 Install
 -------
