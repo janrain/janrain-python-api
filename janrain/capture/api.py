@@ -18,7 +18,8 @@ logger = logging.getLogger(__name__)
 try:
     import requests
 except ImportError:
-    logger.warn("Missing 'requests' module. Install using 'pip install requests'.")
+    logger.warn(
+        "Missing 'requests' module. Install using 'pip install requests'.")
 
 
 def api_encode(value):
@@ -99,10 +100,12 @@ def generate_signature(api_call, unsigned_params):
             kv_str = ["{}={}".format(k, v) for k, v in params.items()]
             kv_str.sort()
             data += "\n".join(kv_str) + "\n"
-        sha1_str = hmac.new(client_secret.encode('utf-8'), data.encode('utf-8'), sha1).digest()
+        sha1_str = hmac.new(client_secret.encode('utf-8'),
+                            data.encode('utf-8'), sha1).digest()
         hash_str = b64encode(sha1_str)
         headers['Date'] = timestamp
-        signature = "Signature {}:{}".format(client_id, hash_str.decode('utf-8'))
+        signature = "Signature {}:{}".format(
+            client_id, hash_str.decode('utf-8'))
         headers['Authorization'] = signature
         logger.debug(signature)
 
@@ -119,13 +122,14 @@ def raise_api_exceptions(response):
     Raises:
         ApiResponseError
     """
-    if response['stat'] == 'error':
+    if 'stat' in response and response['stat'] == 'error':
         logger.debug("Response:\n" + to_json(response, indent=4))
         try:
             message = response['error_description']
         except KeyError:
             message = response['message']
-        raise ApiResponseError(response['code'], response['error'], message, response)
+        raise ApiResponseError(
+            response['code'], response['error'], message, response)
 
 
 class Api(object):
@@ -133,13 +137,12 @@ class Api(object):
     Base object for making API calls to the Janrain API.
 
     Args:
-        api_url       - Absolute URL to API.
-        defaults      - A dictionary of default params to pass to every call.
-        compress      - A boolean indicating to use gzip compression.
-        sign_requests - A boolean indicating to sign the requests.
-        user_agent    - A string to use as a User-Agent request header.
-        timeout       - How many seconds to wait for the server to send data before giving up,
-                        as a float/int or a tuple (connect timeout, read timeout).
+        api_url         - Absolute URL to API.
+        defaults        - A dictionary of default params to pass to every call.
+        compress        - A boolean indicating to use gzip compression.
+        sign_requests   - A boolean indicating to sign the requests.
+        user_agent      - A string specifying the HTTP user agent.
+        connect_timeout - Seconds to wait for HTTP connection to be established.
 
     Example:
         defaults = {'client_id': "...", 'client_secret': "..."}
@@ -147,8 +150,10 @@ class Api(object):
         count = api.call("entity.count", type_name="user")
     """
 
-    def __init__(self, api_url, defaults={}, compress=True, sign_requests=True, user_agent=None, timeout=None):
+    def __init__(self, api_url, defaults={}, compress=True, sign_requests=True,
+                 user_agent=None, connect_timeout=10):
 
+        api_url = api_url.rstrip("/")
         if api_url[0:4] == "http":
             self.api_url = api_url
         else:
@@ -163,7 +168,10 @@ class Api(object):
         else:
             self.user_agent = user_agent
 
-        self.timeout = timeout
+        # read timeout will match 'timeout' parameter passed to API call
+        self.connect_timeout = connect_timeout
+
+        self.session = requests.Session()
 
     def call(self, api_call, **kwargs):
         """
@@ -217,8 +225,15 @@ class Api(object):
 
         # Let any exceptions here get raised to the calling code. This includes
         # things like connection errors and timeouts.
-        r = requests.post(url, headers=headers, data=params, timeout=self.timeout)
 
+        if 'timeout' in params:
+            read_timeout = params['timeout']
+        else:
+            read_timeout = 10
+        r = self.session.post(url, headers=headers, data=params,
+                              timeout=(self.connect_timeout, read_timeout))
+
+        # json.decoder.JSONDecodeError
         try:
             raise_api_exceptions(r.json())
             if r.status_code not in (200, 400, 401):

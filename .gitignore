@@ -12,6 +12,7 @@ build/
 develop-eggs/
 dist/
 eggs/
+.eggs/
 lib/
 lib64/
 parts/
@@ -58,3 +59,4 @@ target/
 # Virtual Environment
 venv
 
+.DS_Store
