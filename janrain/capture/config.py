@@ -141,7 +141,7 @@ def read_config_file():
     """
     file = get_config_file()
     with open(file) as stream:
-        yaml_dict = yaml.load(stream.read())
+        yaml_dict = yaml.safe_load(stream)
     config = ConfigDict(file, yaml_dict)
     # merge clusters into clients
     if 'clusters' in config and 'clients' in config:
